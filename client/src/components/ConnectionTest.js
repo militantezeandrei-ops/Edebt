@@ -16,7 +16,7 @@ const ConnectionTest = () => {
       }
 
       try {
-        const response = await axios.get(`${API_URL}/api/health`, {
+        await axios.get(`${API_URL}/api/health`, {
           timeout: 5000
         });
         setStatus('connected');
