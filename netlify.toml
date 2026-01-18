@@ -6,6 +6,7 @@
 [build.environment]
   # Environment variables during build
   NODE_ENV = "production"
+  REACT_APP_API_URL = "https://debtandpos-production.up.railway.app"
 
 [[redirects]]
   from = "/*"
