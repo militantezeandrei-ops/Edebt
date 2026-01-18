@@ -1,6 +1,6 @@
 {
-  "short_name": "QR Scanner",
-  "name": "QR Scanner - Customer Orders",
+  "short_name": "DebtandPOS",
+  "name": "Debt and POS - QR Scanner",
   "description": "Scan QR codes and manage customer orders",
   "icons": [
     {
@@ -21,13 +21,21 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#667eea",
   "background_color": "#ffffff",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "scope": "/",
   "categories": ["business", "productivity"],
+  "screenshots": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
   "screenshots": [],
   "shortcuts": []
 }
