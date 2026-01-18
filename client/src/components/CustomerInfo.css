@@ -1,0 +1,28 @@
+.customer-info {
+  margin-bottom: 20px;
+}
+
+.customer-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-row {
+  display: flex;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #667eea;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #495057;
+  min-width: 120px;
+}
+
+.detail-value {
+  color: #212529;
+  flex: 1;
+}

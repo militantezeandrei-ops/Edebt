@@ -1,0 +1,24 @@
+.qr-scanner-container {
+  margin-bottom: 20px;
+}
+
+.scanner-instruction {
+  color: #666;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.qr-reader {
+  margin: 20px auto;
+  max-width: 500px;
+}
+
+.loading-message {
+  background: #d1ecf1;
+  color: #0c5460;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  border: 1px solid #bee5eb;
+}
