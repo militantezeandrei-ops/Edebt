@@ -1,5 +1,5 @@
 // This service worker makes the app installable and works offline
-const CACHE_NAME = 'qr-scanner-v1';
+const CACHE_NAME = 'e-debt-v1';
 const urlsToCache = [
   '/',
   '/static/css/main.css',

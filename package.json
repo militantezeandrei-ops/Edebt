@@ -1,7 +1,7 @@
 {
-  "name": "qr-scanner-app",
+  "name": "e-debt-app",
   "version": "1.0.0",
-  "description": "QR Scanner app for customer orders",
+  "description": "E-Debt & Handwritten Order System - Customer Orders",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -194,7 +194,7 @@ const QRScanner = ({ onScanSuccess, onCustomerNotFound }) => {
   return (
     <div className="qr-scanner-container">
       <div className="card scanner-card">
-        <h2>Scan QR Code</h2>
+        <h2>Scan Code</h2>
 
         {error && (
           <div className={`error-message ${!isSecureContext ? 'warning-bg' : ''}`}>

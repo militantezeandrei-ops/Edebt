@@ -1,7 +1,7 @@
 {
-  "short_name": "QR Scanner",
-  "name": "QR Scanner - Customer Orders",
-  "description": "Scan QR codes and manage customer orders",
+  "short_name": "E-Debt",
+  "name": "E-Debt - Handwritten Orders",
+  "description": "Scan orders and manage customer debts",
   "icons": [
     {
       "src": "favicon.ico",
@@ -27,7 +27,10 @@
   "background_color": "#ffffff",
   "orientation": "portrait",
   "scope": "/",
-  "categories": ["business", "productivity"],
+  "categories": [
+    "business",
+    "productivity"
+  ],
   "screenshots": [],
   "shortcuts": []
 }

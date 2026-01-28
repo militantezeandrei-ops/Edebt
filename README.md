@@ -1,63 +1,38 @@
-# QR Scanner - Customer Orders App
+# e-Debt & Handwritten Order System
 
-A full-stack application for scanning customer QR codes and managing their orders. The workflow is: **Scan QR → Choose Order → Save to Database**.
+A full-stack application for digitizing handwritten order slips using advanced Cloud-based OCR and managing customer orders and debts. The workflow is: **Capture Handwriting → Verify Order → Save to Database**.
 
 ## Features
 
-- 📱 QR Code Scanner - Scan customer unique IDs from QR codes
-- 👤 Customer Management - View customer information after scanning
-- 🛒 Order Selection - Choose from predefined orders or create custom orders
-- 💾 Online Database - Save orders to MongoDB Atlas (cloud database)
-- 🎨 Modern UI - Beautiful, responsive interface
+- � **Handwritten Recognition** - Analyze handwritten order slips using **Cloud-based OCR** technology to automatically extract items and prices
+- 👤 **Customer Management** - View customer information, track balances, and manage profiles
+- 🛒 **Smart Order Processing** - Auto-detect items, prices, and map them to customers
+- 💾 **Online Database** - Real-time data sync with MongoDB Atlas
+- 🎨 **Modern UI** - Beautiful, responsive interface with Dark Mode support and PWA capabilities
 
 ## Tech Stack
 
-- **Frontend**: React with HTML5 QR Code Scanner
+- **Frontend**: React.js
 - **Backend**: Node.js with Express
-- **Database**: MongoDB Atlas (Cloud Database)
-- **API**: RESTful API for customer and order management
+- **Database**: MongoDB Atlas
+- **AI/OCR**: Cloud-based Generative AI for handwriting recognition
+- **API**: RESTful API
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
-- MongoDB Atlas account (free tier available)
-- npm or yarn
+- MongoDB Atlas account
+- Cloud OCR Service API Key
 
 ## Setup Instructions
 
-### 1. MongoDB Atlas Setup (Online Database)
+### 1. MongoDB Atlas Setup
 
-1. **Create a MongoDB Atlas Account:**
-   - Go to [https://www.mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
-   - Sign up for a free account
-
-2. **Create a Cluster:**
-   - Click "Build a Database"
-   - Choose the FREE tier (M0)
-   - Select a cloud provider and region
-   - Click "Create Cluster"
-
-3. **Create Database User:**
-   - Go to "Database Access" in the left sidebar
-   - Click "Add New Database User"
-   - Choose "Password" authentication
-   - Enter a username and password (save these!)
-   - Set user privileges to "Atlas admin" or "Read and write to any database"
-   - Click "Add User"
-
-4. **Configure Network Access:**
-   - Go to "Network Access" in the left sidebar
-   - Click "Add IP Address"
-   - Click "Allow Access from Anywhere" (for development) or add your IP
-   - Click "Confirm"
-
-5. **Get Connection String:**
-   - Go to "Database" in the left sidebar
-   - Click "Connect" on your cluster
-   - Choose "Connect your application"
-   - Copy the connection string (looks like: `mongodb+srv://username:password@cluster.mongodb.net/`)
-   - Replace `<password>` with your database user password
-   - Replace `<dbname>` with `qr_scanner_db` (or any name you prefer)
+1. Create a free account at [MongoDB Cloud](https://www.mongodb.com/cloud/atlas).
+2. Create a Cluster (M0 Free Tier).
+3. Create a Database User (Username/Password).
+4. Allow Network Access (IP Whitelist).
+5. Get the Connection String (SRV URI).
 
 ### 2. Install Dependencies
 
@@ -72,13 +47,17 @@ npm run install-all
    cp .env.example .env
    ```
 
-2. Edit `.env` and add your MongoDB connection string:
-   ```
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/qr_scanner_db?retryWrites=true&w=majority
-   PORT=5000
-   ```
+2. Edit `.env` and add your credentials:
+   ```env
+   # Database Connection
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/debt_app_db?retryWrites=true&w=majority
 
-   Replace `username`, `password`, and `cluster` with your actual MongoDB Atlas credentials.
+   # Server Port
+   PORT=5000
+
+   # Cloud OCR Service API Key (Required for Handwriting features)
+   GOOGLE_VISION_API_KEY=your_api_key_here
+   ```
 
 ### 4. Start the Application
 
@@ -86,97 +65,41 @@ npm run install-all
 ```bash
 npm start
 ```
-The server will run on `http://localhost:5000`
+Server runs on: `http://localhost:5000`
 
 **Terminal 2 - Frontend Client:**
 ```bash
 npm run client
 ```
-The app will open in your browser at `http://localhost:3000`
+App opens at: `http://localhost:3000`
 
 ## Usage
 
-1. **Scan QR Code**: Point your camera at a customer's QR code containing their unique ID
-2. **View Customer Info**: After scanning, customer information is displayed
-3. **Create Customer** (if not found): If the customer doesn't exist, you'll be prompted to create them
-4. **Select Order**: 
-   - Choose from predefined orders (quick select buttons)
-   - Or manually enter order details
-5. **Save Order**: Click "Save Order" to store it in the MongoDB database linked to the customer
+### 📝 Capturing Handwritten Orders
+1. Navigate to the **"Capture Order"** tab.
+2. Click **"Capture Order Slip"**.
+3. Take a clear photo of the handwritten note.
+4. The system will use **Cloud-based OCR** to read the text.
+5. Review the detected items and prices.
+6. Assign to a customer (if not auto-detected) and click **"Save Order"**.
+
+### 📊 Reports & Analytics
+- View weekly sales reports
+- Track customer debts and frequently ordered items
+- Export data as needed
 
 ## API Endpoints
 
 ### Customers
-- `GET /api/customer/:uniqueId` - Get customer by unique ID
+- `GET /api/customer/:uniqueId` - Get customer details
 - `POST /api/customer` - Create new customer
+- `GET /api/customers/search` - Fuzzy search customers by name
 
 ### Orders
-- `GET /api/customer/:uniqueId/orders` - Get all orders for a customer
-- `POST /api/order` - Create new order
 - `GET /api/orders` - Get all orders
-
-### Health Check
-- `GET /api/health` - Check server and database connection status
-
-## Sample Customer IDs
-
-The database is automatically populated with sample customers on first run:
-- `CUST001` - John Doe
-- `CUST002` - Jane Smith
-- `CUST003` - Bob Johnson
-
-You can create QR codes with these IDs for testing.
-
-## Creating QR Codes for Testing
-
-You can use any QR code generator online (like [qr-code-generator.com](https://www.qr-code-generator.com/)) and enter one of the sample customer IDs (e.g., `CUST001`) to generate a test QR code.
-
-## Database Schema
-
-### Customers Collection
-- `_id` - MongoDB ObjectId (auto-generated)
-- `unique_id` - Unique customer identifier (from QR code) - **Indexed**
-- `name` - Customer name
-- `email` - Customer email
-- `phone` - Customer phone
-- `createdAt` - Auto-generated timestamp
-- `updatedAt` - Auto-generated timestamp
-
-### Orders Collection
-- `_id` - MongoDB ObjectId (auto-generated)
-- `customer_id` - Reference to Customer document
-- `customer_unique_id` - Customer unique ID - **Indexed**
-- `order_name` - Name of the order
-- `order_description` - Order description
-- `order_amount` - Order amount (number)
-- `order_status` - Order status (pending, processing, completed, cancelled)
-- `createdAt` - Auto-generated timestamp
-- `updatedAt` - Auto-generated timestamp
-
-## Development
-
-- Backend runs on port 5000
-- Frontend runs on port 3000
-- Database: MongoDB Atlas (cloud-hosted)
-- Environment variables: `.env` file (not committed to git)
-
-## Troubleshooting
-
-### Connection Issues
-- Verify your MongoDB connection string in `.env`
-- Check that your IP address is whitelisted in MongoDB Atlas
-- Ensure your database user has the correct permissions
-- Check the server logs for detailed error messages
-
-### Port Already in Use
-If port 5000 is already in use:
-```bash
-# Windows PowerShell
-netstat -ano | findstr :5000
-taskkill /PID <PID> /F
-
-# Or change PORT in .env file
-```
+- `POST /api/order` - Create single order
+- `POST /api/orders/batch` - Create multiple orders
+- `POST /api/ocr/process` - Process image with Cloud-based OCR
 
 ## License
 

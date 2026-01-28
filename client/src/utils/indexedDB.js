@@ -1,5 +1,5 @@
 // IndexedDB wrapper for offline-first data storage
-const DB_NAME = 'qr-scanner-db';
+const DB_NAME = 'e-debt-db';
 const DB_VERSION = 1;
 
 let db = null;
