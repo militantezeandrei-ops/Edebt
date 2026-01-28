@@ -1,0 +1,317 @@
+/* Layout */
+.menu-management {
+  max-width: 1200px;
+  /* Wider for dashboard feel */
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.header-row h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--header-text);
+}
+
+.menu-content-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .menu-content-grid {
+    grid-template-columns: 350px 1fr;
+    /* Fixed form width, fluid list */
+    align-items: start;
+  }
+
+  .menu-form-card {
+    position: sticky;
+    top: 20px;
+  }
+}
+
+/* Form Card */
+.menu-form-card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+.menu-form-card h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  color: #4b5563;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.modern-input,
+.modern-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  background: var(--input-bg);
+  color: var(--text-main);
+}
+
+.modern-input:focus,
+.modern-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
+  background: var(--card-bg);
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* Buttons */
+.button-primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+}
+
+.button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4);
+}
+
+.button-ghost {
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* List Section */
+.menu-list-container h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: var(--header-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  font-weight: normal;
+}
+
+/* Menu Cards (Grid Layout - Matching OrderSelection) */
+.menu-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+  padding-right: 5px;
+}
+
+.menu-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100px;
+  /* Fixed height for uniformity */
+  position: relative;
+  box-shadow: none;
+  /* Reset shadow to match orders default */
+}
+
+.menu-card:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Hide thumbnail since Orders view doesn't have it */
+.menu-thumb {
+  display: none;
+}
+
+.menu-info {
+  width: 100%;
+}
+
+.menu-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 0.95rem;
+  /* Match order-name */
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.menu-meta {
+  display: flex;
+  justify-content: center;
+}
+
+.price {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.category-badge {
+  display: none;
+  /* Orders view doesn't show category on card */
+}
+
+/* Actions - Overlay */
+.menu-actions {
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  /* Space out delete and edit */
+  padding: 0 5px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  /* Let clicks pass through to card unless hitting buttons */
+}
+
+.menu-card:hover .menu-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Toggle Switch - Absolute Top Right */
+.status-toggle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 0;
+  z-index: 10;
+}
+
+.toggle-switch {
+  width: 24px;
+  /* Small */
+  height: 14px;
+  background: var(--border-color);
+  border-radius: 7px;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.toggle-switch.on {
+  background: #10b981;
+}
+
+.toggle-handle {
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch.on .toggle-handle {
+  transform: translateX(10px);
+}
+
+/* Action Icons */
+.icon-btn {
+  width: 24px;
+  height: 24px;
+  font-size: 0.8rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.delete-btn {
+  color: #dc2626;
+}
+
+.edit-btn {
+  color: #2563eb;
+}
+
+.delete-btn:hover {
+  background: #fee2e2;
+}
+
+.edit-btn:hover {
+  background: #eff6ff;
+}
+
+/* Checkbox Toggle Styled */
+.flex-center-y {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.mr-2 {
+  margin-right: 8px;
+}
+
+.toggle-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #10b981;
+}

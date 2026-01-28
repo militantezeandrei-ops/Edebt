@@ -2,15 +2,207 @@
   margin-bottom: 20px;
 }
 
+.scanner-card {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.scanner-ui {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scanner-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.scanner-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 12px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: white;
+}
+
+.scanner-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.camera-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.manual-btn {
+  background: white;
+  border: 2px solid #667eea;
+  color: #667eea;
+}
+
+/* Manual Input Section */
+.manual-input-section {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.manual-input-section h3 {
+  margin: 0;
+  color: #374151;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.bg-check-input {
+  position: relative;
+  width: 100%;
+}
+
+.manual-input {
+  width: 100%;
+  padding: 15px;
+  padding-right: 40px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  /* Large text for easy typing */
+  transition: all 0.2s;
+  box-sizing: border-box;
+  /* Fix width issues */
+}
+
+.manual-input:focus {
+  border-color: #667eea;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.suggestions-list {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.suggestion-item {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: #f9fafb;
+}
+
+.s-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.s-id {
+  font-size: 0.85rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.manual-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.button-ghost {
+  background: transparent;
+  color: #6b7280;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px 20px;
+}
+
+.button-ghost:hover {
+  background: #f3f4f6;
+  border-radius: 8px;
+  color: #374151;
+}
+
+.btn-icon {
+  font-size: 1.5rem;
+}
+
 .scanner-instruction {
-  color: #666;
-  margin-bottom: 20px;
+  color: #888;
+  margin-top: 15px;
+  font-size: 0.9rem;
   text-align: center;
 }
 
-.qr-reader {
-  margin: 20px auto;
+.camera-view {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.qr-viewport {
+  width: 100%;
   max-width: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+.cancel-btn {
+  width: auto;
+  min-width: 200px;
 }
 
 .loading-message {
@@ -21,4 +213,22 @@
   margin-bottom: 15px;
   text-align: center;
   border: 1px solid #bee5eb;
+  width: 100%;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #f5c6cb;
+  width: 100%;
+  text-align: center;
+}
+
+.warning-bg {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffc107;
 }

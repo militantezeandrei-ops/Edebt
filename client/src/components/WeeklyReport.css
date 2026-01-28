@@ -1,0 +1,41 @@
+.weekly-report {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.report-table th,
+.report-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.total-row {
+    background-color: #e9ecef;
+}
+
+@media (max-width: 768px) {
+    .weekly-report {
+        padding-bottom: 60px;
+    }
+
+    .report-content {
+        overflow-x: auto;
+    }
+
+    .report-table th,
+    .report-table td {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .header-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

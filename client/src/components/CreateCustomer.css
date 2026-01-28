@@ -73,3 +73,26 @@
   color: #6c757d;
   cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+  .create-customer-card {
+    max-height: 80vh;
+    padding: 15px;
+  }
+
+  .create-customer-overlay {
+    align-items: flex-end;
+    /* Sheet-like behavior or just standard centering */
+    padding: 10px;
+    z-index: 2000;
+    /* Ensure it's above bottom nav */
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
+}

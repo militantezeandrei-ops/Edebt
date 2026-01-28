@@ -1,0 +1,345 @@
+/* Base Layout */
+.analytics-dashboard {
+    padding: 10px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header h2 {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+/* Bento Grid */
+.bento-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    grid-template-areas:
+        "metric1 metric2"
+        "insight insight"
+        "products products"
+        "debt debt";
+}
+
+@media (min-width: 768px) {
+    .bento-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-areas:
+            "metric1 metric2 products"
+            "insight insight products"
+            "debt debt debt";
+    }
+}
+
+/* Cards */
+.bento-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.metric-card {
+    position: relative;
+    min-height: 140px;
+}
+
+.metric-card:nth-child(1) {
+    grid-area: metric1;
+}
+
+.metric-card:nth-child(2) {
+    grid-area: metric2;
+}
+
+.ai-insight-card {
+    grid-area: insight;
+}
+
+.products-card {
+    grid-area: products;
+}
+
+.debt-card {
+    grid-area: debt;
+}
+
+/* Metric Styling */
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.metric-title {
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.metric-icon {
+    font-size: 1.2rem;
+    background: #f9fafb;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 10px;
+}
+
+.mini-chart {
+    flex-grow: 1;
+    margin-bottom: -10px;
+    /* pull chart to edge */
+}
+
+/* AI Insights */
+.ai-insight-card {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+}
+
+.ai-insight-card .card-header h3 {
+    margin: 0 0 15px 0;
+    color: white;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.insight-content {
+    display: flex;
+    flex-direction: column;
+    /* Mobile first stack */
+    gap: 15px;
+}
+
+@media (min-width: 500px) {
+    .insight-content {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+.insight-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 12px;
+    flex: 1;
+}
+
+.icon-badge {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.label {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+}
+
+.value {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.value.negative {
+    color: #fca5a5;
+}
+
+/* Product List */
+.product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.product-item {
+    position: relative;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #f3f4f6;
+}
+
+.p-rank {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-size: 0.7rem;
+    color: #9ca3af;
+    font-weight: bold;
+}
+
+.p-info {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 15px;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.p-name {
+    font-weight: 600;
+    color: #374151;
+}
+
+.p-count {
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.p-bar-bg {
+    height: 6px;
+    background: #f3f4f6;
+    border-radius: 3px;
+    margin-left: 15px;
+    overflow: hidden;
+}
+
+.p-bar {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 3px;
+}
+
+/* Debt List */
+.debt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.debt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background: #fef2f2;
+    border-radius: 12px;
+    border: 1px solid #fee2e2;
+}
+
+.d-avatar {
+    width: 36px;
+    height: 36px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+.d-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.d-name {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+.d-id {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.d-amount {
+    color: #dc2626;
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+/* === Dark Mode Styles === */
+[data-theme="dark"] .dashboard-header h2 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .bento-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .metric-title {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .metric-value {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .metric-icon {
+    background: #334155;
+}
+
+[data-theme="dark"] .p-name {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .p-count {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .p-rank {
+    color: #64748b;
+}
+
+[data-theme="dark"] .p-bar-bg {
+    background: #334155;
+}
+
+[data-theme="dark"] .product-item {
+    border-color: #334155;
+}
+
+[data-theme="dark"] .debt-item {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme="dark"] .d-name {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .d-id {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .d-amount {
+    color: #f87171;
+}
+
+[data-theme="dark"] .card-header h3 {
+    color: #f1f5f9;
+}

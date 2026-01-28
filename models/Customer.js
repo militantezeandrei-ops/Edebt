@@ -20,10 +20,26 @@ const customerSchema = new mongoose.Schema({
   phone: {
     type: String,
     trim: true
+  },
+  balance: {
+    type: Number,
+    default: 0
+  },
+  last_transaction_date: {
+    type: Date
+  },
+  is_active: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true // This adds createdAt and updatedAt fields
 });
+
+// Additional indexes for performance optimization
+customerSchema.index({ name: 'text' }); // Text search index
+customerSchema.index({ is_active: 1, balance: -1 }); // Compound index for filtering
+customerSchema.index({ last_transaction_date: -1 }); // For sorting by recent activity
 
 const Customer = mongoose.model('Customer', customerSchema);
 

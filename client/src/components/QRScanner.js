@@ -1,238 +1,276 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import axios from 'axios';
 import API_URL from '../config/api';
 import './QRScanner.css';
+import { OfflineStorage } from '../utils/offlineStorage';
 
 const QRScanner = ({ onScanSuccess, onCustomerNotFound }) => {
-  const scannerRef = useRef(null);
+  const [scanMode, setScanMode] = useState('idle'); // 'idle', 'camera', 'file'
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const isScanningRef = useRef(false);
+  const scannerRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [isSecureContext, setIsSecureContext] = useState(true);
 
-  // Check if running in secure context (HTTPS or localhost)
+  // Manual & Data State
+  const [manualCode, setManualCode] = useState('');
+  const [showManualInput, setShowManualInput] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+
+  // Check secure context
   useEffect(() => {
-    const isSecure = window.isSecureContext || 
-                     window.location.protocol === 'https:' || 
-                     window.location.hostname === 'localhost' ||
-                     window.location.hostname === '127.0.0.1';
-    
-    if (!isSecure) {
-      setIsSecureContext(false);
-      setError('Camera access requires HTTPS or localhost. Please use https:// or access via localhost.');
-    }
+    const isSecure = window.isSecureContext ||
+      window.location.protocol === 'https:' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+    setIsSecureContext(isSecure);
   }, []);
 
-  const handleScan = useCallback(async (scannedText) => {
-    // Prevent multiple simultaneous scans
-    if (isScanningRef.current) {
-      return;
+  const cleanupScanner = async () => {
+    if (scannerRef.current) {
+      try {
+        if (scannerRef.current.isScanning) {
+          await scannerRef.current.stop();
+        }
+        scannerRef.current.clear();
+      } catch (err) {
+        console.error("Error stopping scanner:", err);
+      }
+      scannerRef.current = null;
     }
-    
-    isScanningRef.current = true;
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupScanner();
+    };
+  }, []);
+
+  const handleScanResult = useCallback(async (decodedText) => {
     setLoading(true);
     setError(null);
 
+    // Stop scanning immediately upon success
+    await cleanupScanner();
+    setScanMode('idle');
+
+    // === 1. LOCAL SEARCH (OFFLINE FIRST / SPEED OPTIMIZATION) ===
+    // Check cached customers list first (Name or ID)
+    const normalizedQuery = decodedText.toLowerCase().trim();
+    // Re-verify we have customers loaded
+    let localList = customers;
+    if (localList.length === 0) {
+      localList = OfflineStorage.loadData('customers') || [];
+    }
+
+    const foundLocal = localList.find(c =>
+      (c.unique_id && c.unique_id.toLowerCase() === normalizedQuery) ||
+      (c.name && c.name.toLowerCase() === normalizedQuery) ||
+      (c._id === decodedText)
+    );
+
+    if (foundLocal) {
+      console.log("Found customer in local cache:", foundLocal);
+      onScanSuccess(foundLocal.unique_id, foundLocal);
+      setLoading(false);
+      return;
+    }
+
+    // === 2. SERVER SEARCH (Backup) ===
     try {
-      // Try to fetch customer by unique ID
-      console.log('Fetching customer:', scannedText, 'from:', `${API_URL}/api/customer/${scannedText}`);
-      const response = await axios.get(`${API_URL}/api/customer/${scannedText}`, {
-        timeout: 10000 // 10 second timeout
+      console.log('Fetching customer from server:', decodedText);
+      const response = await axios.get(`${API_URL}/api/customer/${decodedText}`, {
+        timeout: 5000
       });
-      
-      console.log('Customer response:', response.data);
-      
+
       if (response.data) {
-        // Stop scanner
-        if (scannerRef.current) {
-          try {
-            await scannerRef.current.clear();
-          } catch (err) {
-            console.error("Error clearing scanner:", err);
-          }
-          scannerRef.current = null;
-        }
-        
-        // Reset scanning state before passing to parent
-        isScanningRef.current = false;
-        setLoading(false);
-        
-        // Pass customer data to parent
-        onScanSuccess(scannedText, response.data);
+        onScanSuccess(decodedText, response.data);
       }
     } catch (err) {
       if (err.response && err.response.status === 404) {
-        // Stop scanner
-        if (scannerRef.current) {
-          try {
-            await scannerRef.current.clear();
-          } catch (clearErr) {
-            console.error("Error clearing scanner:", clearErr);
-          }
-          scannerRef.current = null;
-        }
-        
-        // Notify parent to show create customer dialog
         if (onCustomerNotFound) {
-          onCustomerNotFound(scannedText);
+          onCustomerNotFound(decodedText);
         } else {
-          setError(`Customer with ID "${scannedText}" not found. Please create the customer first or scan a valid QR code.`);
-          isScanningRef.current = false;
-          setLoading(false);
+          setError(`Customer "${decodedText}" not found locally or on server.`);
         }
       } else {
-        // Network or other errors
-        console.error('API Error:', err);
-        console.error('API URL:', API_URL);
-        console.error('Full error:', err.message);
-        
-        let errorMessage = 'Error fetching customer data. ';
-        if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
-          errorMessage += 'Cannot connect to server. Make sure the backend is running on ' + API_URL;
-        } else if (err.code === 'ERR_NETWORK') {
-          errorMessage += 'Network error. Check your connection and backend server.';
-        } else {
-          errorMessage += err.message || 'Please try again.';
-        }
-        
-        setError(errorMessage);
-        isScanningRef.current = false;
-        setLoading(false);
+        // Network error and not found locally
+        setError('Connection failed and customer not in offline cache.');
       }
+    } finally {
+      setLoading(false);
     }
-  }, [onScanSuccess, onCustomerNotFound]);
+  }, [customers, onScanSuccess, onCustomerNotFound]);
 
-  // Reset state when component mounts
-  useEffect(() => {
-    // Reset scanning state
-    isScanningRef.current = false;
-    setLoading(false);
+  const startCamera = async () => {
+    if (!isSecureContext) {
+      setError("Camera requires HTTPS or localhost.");
+      return;
+    }
+
+    setScanMode('camera');
     setError(null);
+
+    try {
+      await cleanupScanner();
+
+      const scanner = new Html5Qrcode("qr-reader-element");
+      scannerRef.current = scanner;
+
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          handleScanResult(decodedText);
+        },
+        (errorMessage) => {
+          // Ignore frame parse errors
+        }
+      );
+    } catch (err) {
+      console.error("Camera start error:", err);
+      setError("Could not start camera. Please ensure permissions are granted.");
+      setScanMode('idle');
+    }
+  };
+
+  // Fetch customers for autocomplete
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/customers`);
+        setCustomers(res.data);
+        OfflineStorage.saveData('customers', res.data);
+      } catch (err) {
+        console.error("Error loading customers:", err);
+        // Offline Fallback
+        const cached = OfflineStorage.loadData('customers');
+        if (cached) {
+          setCustomers(cached);
+        }
+      }
+    };
+    fetchCustomers();
   }, []);
 
-  useEffect(() => {
-    // Don't initialize scanner if not in secure context
-    if (!isSecureContext) {
-      return;
-    }
+  const handleManualSearchChange = (e) => {
+    const value = e.target.value;
+    setManualCode(value);
 
-    // Clear any existing content in the container first
-    const qrReaderElement = document.getElementById("qr-reader");
-    if (qrReaderElement) {
-      qrReaderElement.innerHTML = "";
+    if (value.length > 0) {
+      const matches = customers.filter(c =>
+        c.name.toLowerCase().includes(value.toLowerCase()) ||
+        c.unique_id.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5); // Limit to 5 suggestions
+      setSuggestions(matches);
+    } else {
+      setSuggestions([]);
     }
+  };
 
-    // Reset scanning state when scanner is shown
-    isScanningRef.current = false;
-    setLoading(false);
+  const selectCustomer = (customer) => {
+    onScanSuccess(customer.unique_id, customer);
+    setShowManualInput(false);
+    setManualCode('');
+  };
+
+  const submitManualCode = () => {
+    if (manualCode.trim()) {
+      handleScanResult(manualCode.trim());
+    }
+  };
+
+
+
+  const cancelScan = async () => {
+    await cleanupScanner();
+    setScanMode('idle');
     setError(null);
-
-    // Don't create if scanner already exists
-    if (scannerRef.current) {
-      return;
-    }
-
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      try {
-        const scanner = new Html5QrcodeScanner(
-          "qr-reader",
-          {
-            qrbox: {
-              width: 250,
-              height: 250
-            },
-            fps: 10,
-            aspectRatio: 1.0
-          },
-          false
-        );
-
-        scanner.render(
-          (decodedText) => {
-            handleScan(decodedText);
-          },
-          (errorMessage) => {
-            // Handle scan error - check for secure context errors
-            if (errorMessage && errorMessage.includes('secure context')) {
-              setIsSecureContext(false);
-              setError('Camera access requires HTTPS. Please access via https:// or localhost.');
-            }
-          }
-        );
-
-        scannerRef.current = scanner;
-      } catch (err) {
-        if (err.message && err.message.includes('secure context')) {
-          setIsSecureContext(false);
-          setError('Camera access requires HTTPS. Please access via https:// or localhost.');
-        } else {
-          setError('Error initializing camera: ' + err.message);
-        }
-      }
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(err => {
-          console.error("Error clearing scanner:", err);
-        });
-        scannerRef.current = null;
-      }
-      // Clear the container element
-      const qrReaderElement = document.getElementById("qr-reader");
-      if (qrReaderElement) {
-        qrReaderElement.innerHTML = "";
-      }
-      isScanningRef.current = false;
-    };
-  }, [handleScan, isSecureContext]);
+  };
 
   return (
     <div className="qr-scanner-container">
-      <div className="card">
+      <div className="card scanner-card">
         <h2>Scan QR Code</h2>
-        <p className="scanner-instruction">
-          Point your camera at the customer's QR code to scan their unique ID
-        </p>
-        
-        {!isSecureContext && (
-          <div className="error-message" style={{ 
-            background: '#fff3cd', 
-            color: '#856404', 
-            border: '1px solid #ffc107',
-            padding: '20px',
-            borderRadius: '8px',
-            marginBottom: '20px'
-          }}>
-            <h3 style={{ marginTop: 0 }}>⚠️ Secure Context Required</h3>
-            <p><strong>Camera access requires HTTPS or localhost.</strong></p>
-            <p>To use the camera:</p>
-            <ul style={{ textAlign: 'left', display: 'inline-block' }}>
-              <li><strong>Development:</strong> Use <code>http://localhost:3000</code></li>
-              <li><strong>Production:</strong> Deploy with HTTPS (Netlify, Vercel provide this automatically)</li>
-            </ul>
-            <p style={{ marginBottom: 0 }}>
-              <strong>Current URL:</strong> {`${window.location.protocol}//${window.location.host}`}
-            </p>
-          </div>
-        )}
 
-        {error && isSecureContext && (
-          <div className="error-message">
+        {error && (
+          <div className={`error-message ${!isSecureContext ? 'warning-bg' : ''}`}>
             {error}
           </div>
         )}
 
-        {loading && (
-          <div className="loading-message">
-            Processing scan...
-          </div>
-        )}
+        {loading && <div className="loading-message">Processing...</div>}
 
-        {isSecureContext && <div id="qr-reader" className="qr-reader"></div>}
+        {/* Main Interface */}
+        <div className="scanner-ui">
+          {scanMode === 'idle' && !showManualInput && (
+            <div className="scanner-buttons">
+              <button className="scanner-btn camera-btn" onClick={startCamera}>
+                <span className="btn-icon">📸</span>
+                Open Camera
+              </button>
+
+              <button className="scanner-btn manual-btn" onClick={() => setShowManualInput(true)}>
+                <span className="btn-icon">⌨️</span>
+                Manual Order
+              </button>
+
+              <p className="scanner-instruction">
+                Use camera to scan or type name/ID manually
+              </p>
+            </div>
+          )}
+
+          {showManualInput && (
+            <div className="manual-input-section fade-in">
+              <h3>Search Customer</h3>
+              <div className="bg-check-input">
+                <input
+                  type="text"
+                  placeholder="Type name or ID..."
+                  value={manualCode}
+                  onChange={handleManualSearchChange}
+                  className="manual-input"
+                  autoFocus
+                />
+                {manualCode && (
+                  <button className="clear-btn" onClick={() => { setManualCode(''); setSuggestions([]); }}>✕</button>
+                )}
+              </div>
+
+              {suggestions.length > 0 && (
+                <div className="suggestions-list">
+                  {suggestions.map(c => (
+                    <div key={c._id} className="suggestion-item" onClick={() => selectCustomer(c)}>
+                      <span className="s-name">{c.name}</span>
+                      <span className="s-id">{c.unique_id}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="manual-actions">
+                <button className="button button-ghost" onClick={() => setShowManualInput(false)}>Cancel</button>
+                {/* Add fallback Search button if they type exact ID but not in list? */}
+                <button className="button button-primary" onClick={submitManualCode} disabled={!manualCode}>Search ID</button>
+              </div>
+            </div>
+          )}
+
+          {scanMode === 'camera' && (
+            <div className="camera-view">
+              <div id="qr-reader-element" className="qr-viewport"></div>
+              <button className="button button-secondary cancel-btn" onClick={cancelScan}>
+                Cancel Camera
+              </button>
+            </div>
+          )}
+
+          <div id="qr-reader-element" style={{ display: scanMode === 'camera' ? 'block' : 'none' }}></div>
+        </div>
       </div>
     </div>
   );

@@ -1,179 +1,253 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import axios from 'axios';
 import API_URL from '../config/api';
 import './OrderSelection.css';
+import { OfflineStorage } from '../utils/offlineStorage';
+import * as IDB from '../utils/indexedDB';
 
-const OrderSelection = ({ customerId, onOrderSaved, onBack }) => {
-  const [orderName, setOrderName] = useState('');
-  const [orderDescription, setOrderDescription] = useState('');
-  const [orderAmount, setOrderAmount] = useState('');
-  const [orderStatus, setOrderStatus] = useState('pending');
+const OrderSelection = ({ customerId, initialCustomer, onOrderSaved, onBack }) => {
+  const [customerInfo, setCustomerInfo] = useState(initialCustomer || null);
+  const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [messageType, setMessageType] = useState(null);
 
-  // Predefined order options
-  const predefinedOrders = [
-    { name: 'Pizza Margherita', description: 'Classic pizza with tomato and mozzarella', amount: 12.99 },
-    { name: 'Burger Deluxe', description: 'Beef burger with fries', amount: 15.99 },
-    { name: 'Pasta Carbonara', description: 'Creamy pasta with bacon', amount: 14.99 },
-    { name: 'Caesar Salad', description: 'Fresh salad with chicken', amount: 10.99 },
-    { name: 'Sushi Platter', description: 'Assorted sushi rolls', amount: 24.99 },
-  ];
+  // Online State
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  const handlePredefinedOrder = (order) => {
-    setOrderName(order.name);
-    setOrderDescription(order.description);
-    setOrderAmount(order.amount.toString());
-  };
+  useEffect(() => {
+    const handleStatusChange = () => {
+      setIsOnline(navigator.onLine);
+    };
+    window.addEventListener('online', handleStatusChange);
+    window.addEventListener('offline', handleStatusChange);
+    return () => {
+      window.removeEventListener('online', handleStatusChange);
+      window.removeEventListener('offline', handleStatusChange);
+    };
+  }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!orderName.trim()) {
-      setMessage('Please enter an order name');
-      setMessageType('error');
-      return;
+  // Pre-populate cart with items from handwritten capture (if any)
+  useEffect(() => {
+    if (initialCustomer?.capturedItems && initialCustomer.capturedItems.length > 0) {
+      const prefilledCart = initialCustomer.capturedItems.map((item, index) => ({
+        tempId: Date.now() + index,
+        name: item.validatedName || item.originalName,
+        price: item.validatedPrice || 0,
+        description: 'From handwritten capture'
+      }));
+      setCart(prefilledCart);
     }
+  }, [initialCustomer]);
 
-    setLoading(true);
-    setMessage(null);
+  // Auto-save effect for new customers with items
+  useEffect(() => {
+    if (initialCustomer?.shouldAutoSave && cart.length > 0 && !loading) {
+      console.log("Auto-saving order for new customer...");
+      handleCheckout();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart, initialCustomer, loading]);
 
+  // Fetch customer info if not provided
+  useEffect(() => {
+    if (!initialCustomer) {
+      fetchCustomer();
+    }
+  }, [customerId, initialCustomer]);
+
+  const fetchCustomer = async () => {
+    // CACHE-FIRST: Try IndexedDB first
     try {
-      // Parse order amount, handle empty strings and invalid values
-      let parsedAmount = null;
-      if (orderAmount && orderAmount.trim() !== '') {
-        const amount = parseFloat(orderAmount);
-        if (!isNaN(amount) && amount >= 0) {
-          parsedAmount = amount;
-        }
+      const cachedCustomer = await IDB.getCustomer(customerId);
+      if (cachedCustomer) {
+        setCustomerInfo(cachedCustomer);
+      } else {
+        const customers = OfflineStorage.loadData('customers') || [];
+        const found = customers.find(c => c.unique_id === customerId || c._id === customerId);
+        if (found) setCustomerInfo(found);
       }
+    } catch (e) {
+      console.error('Error loading cached customer:', e);
+    }
 
-      const orderData = {
-        customer_unique_id: customerId,
-        order_name: orderName,
-        order_description: orderDescription || null,
-        order_amount: parsedAmount,
-        order_status: orderStatus
-      };
-
-      await axios.post(`${API_URL}/api/order`, orderData);
-      
-      setMessage('Order saved successfully!');
-      setMessageType('success');
-      
-      // Reset form
-      setOrderName('');
-      setOrderDescription('');
-      setOrderAmount('');
-      setOrderStatus('pending');
-
-      // Option to add another order or go back
-      setTimeout(() => {
-        if (window.confirm('Order saved! Would you like to add another order for this customer?')) {
-          setMessage(null);
-        } else {
-          onOrderSaved();
-        }
-      }, 1500);
-
-    } catch (err) {
-      setMessage(err.response?.data?.error || 'Error saving order. Please try again.');
-      setMessageType('error');
-      console.error('Error:', err);
-    } finally {
-      setLoading(false);
+    // THEN: Update from network if online
+    if (navigator.onLine) {
+      try {
+        const res = await axios.get(`${API_URL}/api/customer/${customerId}`);
+        setCustomerInfo(res.data);
+        await IDB.saveCustomer(res.data);
+      } catch (err) {
+        console.log('[OrderSelection] Could not update customer from server:', err.message);
+      }
     }
   };
+
+  const removeFromCart = (tempId) => {
+    setCart(cart.filter(item => item.tempId !== tempId));
+  };
+
+  const handleCheckout = async () => {
+    if (cart.length === 0) return;
+    setLoading(true);
+
+    const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+    const orderRequests = cart.map(item => ({
+      customer_unique_id: customerId,
+      order_name: item.name,
+      order_description: item.description,
+      order_amount: item.price,
+      order_status: 'pending'
+    }));
+
+    // 1. OPTIMISTIC UPDATE - Update local customer balance immediately
+    await OfflineStorage.updateCustomerBalance(customerId, totalAmount);
+
+    // 2. ATTEMPT SERVER SYNC FIRST (using batch endpoint for better performance)
+    let synced = false;
+    if (navigator.onLine) {
+      try {
+        // Use batch endpoint instead of individual requests
+        await axios.post(`${API_URL}/api/orders/batch`, { orders: orderRequests });
+        synced = true;
+        console.log('[OrderSelection] Orders synced to server successfully (batch)');
+      } catch (e) {
+        console.log('[OrderSelection] Server sync failed:', e.message);
+        synced = false;
+      }
+    }
+
+    // 3. ONLY save to IndexedDB if NOT synced (prevents duplicates)
+    if (!synced) {
+      console.log('[OrderSelection] Saving orders to IndexedDB for later sync');
+      for (const item of cart) {
+        await IDB.saveOrder({
+          customer_unique_id: customerId,
+          order_name: item.name,
+          order_description: item.description || '',
+          order_amount: item.price,
+          order_status: 'pending',
+          syncStatus: 'pending'
+        });
+      }
+    }
+
+    // 4. UI FEEDBACK
+    Swal.fire({
+      icon: synced ? 'success' : 'info',
+      title: synced ? 'Order Confirmed!' : 'Order Saved Offline',
+      html: `
+        <div style="text-align: center;">
+          <p style="font-size: 1.2rem; font-weight: 600;">Total: ₱${totalAmount.toFixed(2)}</p>
+          <p style="color: #6b7280; font-size: 0.9rem;">${cart.length} item(s)</p>
+          <p style="margin-top: 8px; color: ${synced ? '#10b981' : '#f59e0b'};">
+            ${synced ? '✓ Synced with server' : '⏳ Will sync when online'}
+          </p>
+        </div>
+      `,
+      timer: 2500,
+      showConfirmButton: false
+    });
+
+    setCart([]);
+    setLoading(false);
+
+    // Update local state
+    if (customerInfo) {
+      setCustomerInfo(prev => ({
+        ...prev,
+        balance: (prev.balance || 0) + totalAmount
+      }));
+    }
+
+    // Navigate back after short delay
+    setTimeout(() => {
+      if (onOrderSaved) onOrderSaved();
+    }, 2500);
+  };
+
+  const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <div className="order-selection card">
-      <h2>Add Order</h2>
-      
-      {message && (
-        <div className={messageType === 'success' ? 'success-message' : 'error-message'}>
-          {message}
-        </div>
-      )}
-
-      <div className="predefined-orders">
-        <h3>Quick Select Orders</h3>
-        <div className="order-buttons">
-          {predefinedOrders.map((order, index) => (
-            <button
-              key={index}
-              className="order-button"
-              onClick={() => handlePredefinedOrder(order)}
-            >
-              <div className="order-button-name">{order.name}</div>
-              <div className="order-button-price">${order.amount}</div>
-            </button>
-          ))}
-        </div>
+    <div className="pos-container">
+      {/* HEADER with customer info and back button */}
+      <div className="order-header">
+        <button className="back-btn" onClick={onBack}>
+          ← Back
+        </button>
+        {customerInfo && (
+          <div className="customer-info-header">
+            <span className="customer-name">{customerInfo.name || customerInfo.unique_id}</span>
+            <span className={`customer-balance ${customerInfo.balance > 0 ? 'debt' : 'credit'}`}>
+              Balance: ₱{(customerInfo.balance || 0).toFixed(2)}
+            </span>
+          </div>
+        )}
+        {!isOnline && (
+          <span className="offline-badge">📴 Offline</span>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="order-form">
-        <div className="form-group">
-          <label htmlFor="orderName">Order Name *</label>
-          <input
-            type="text"
-            id="orderName"
-            value={orderName}
-            onChange={(e) => setOrderName(e.target.value)}
-            placeholder="Enter order name"
-            required
-          />
-        </div>
+      {/* MAIN CONTENT */}
+      <div className="order-content centered-content">
+        {/* Manual entry removed as requested */}
 
-        <div className="form-group">
-          <label htmlFor="orderDescription">Description</label>
-          <textarea
-            id="orderDescription"
-            value={orderDescription}
-            onChange={(e) => setOrderDescription(e.target.value)}
-            placeholder="Enter order description (optional)"
-            rows="3"
-          />
-        </div>
+        {/* Cart */}
+        <div className="cart-section full-width">
+          <h3>🛒 Order Summary</h3>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="orderAmount">Amount ($)</label>
-            <input
-              type="number"
-              id="orderAmount"
-              value={orderAmount}
-              onChange={(e) => setOrderAmount(e.target.value)}
-              placeholder="0.00"
-              step="0.01"
-              min="0"
-            />
+          <div className="cart-list">
+            {cart.length === 0 ? (
+              <div className="empty-cart">
+                <span className="empty-icon">📋</span>
+                <p>No items added yet</p>
+                <p className="empty-hint">Add items using the form on the left</p>
+              </div>
+            ) : (
+              cart.map((item) => (
+                <div key={item.tempId} className="cart-item">
+                  <div className="cart-item-info">
+                    <span className="cart-item-name">{item.name}</span>
+                    <span className="cart-item-price">₱{item.price.toFixed(2)}</span>
+                  </div>
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeFromCart(item.tempId)}
+                    title="Remove item"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="orderStatus">Status</label>
-            <select
-              id="orderStatus"
-              value={orderStatus}
-              onChange={(e) => setOrderStatus(e.target.value)}
+          {/* Cart Footer */}
+          <div className="cart-footer">
+            <div className="cart-summary">
+              <div className="summary-row">
+                <span>Items:</span>
+                <span>{cart.length}</span>
+              </div>
+              <div className="summary-row total">
+                <span>Total:</span>
+                <span>₱{cartTotal.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <button
+              className="checkout-btn"
+              disabled={cart.length === 0 || loading}
+              onClick={handleCheckout}
             >
-              <option value="pending">Pending</option>
-              <option value="processing">Processing</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+              {loading ? (
+                <>⏳ Processing...</>
+              ) : (
+                <>✓ Confirm Order</>
+              )}
+            </button>
           </div>
         </div>
-
-        <div className="button-group">
-          <button type="submit" className="button" disabled={loading}>
-            {loading ? 'Saving...' : 'Save Order'}
-          </button>
-          <button type="button" className="button button-secondary" onClick={onBack}>
-            Back to Scanner
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 };

@@ -37,6 +37,7 @@ const orderSchema = new mongoose.Schema({
 orderSchema.index({ customer_unique_id: 1 });
 orderSchema.index({ customer_id: 1 });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ createdAt: -1, order_status: 1 }); // Compound index for reports
 
 const Order = mongoose.model('Order', orderSchema);
 

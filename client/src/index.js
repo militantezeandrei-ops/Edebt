@@ -10,8 +10,8 @@ root.render(
   </React.StrictMode>
 );
 
-// Register service worker for PWA (only in production)
-if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+// Register service worker for PWA (in both dev and prod for testing)
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/serviceWorker.js')
       .then((registration) => {
@@ -44,5 +44,12 @@ window.showInstallPrompt = () => {
       }
       deferredPrompt = null;
     });
+    return true; // Prompt shown
+  } else {
+    // Debugging info
+    console.log('Cannot show prompt. Deferred prompt is null.');
+    console.log('Service Worker controller:', navigator.serviceWorker.controller);
+    console.log('Secure Context:', window.isSecureContext);
+    return false; // Prompt not shown
   }
 };
