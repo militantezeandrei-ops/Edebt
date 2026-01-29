@@ -652,3 +652,110 @@
 [data-theme='dark'] .editable-items-list .empty {
     color: #94a3b8;
 }
+
+/* =========================================
+   MOBILE CAMERA OPTIMIZATION
+   ========================================= */
+
+/* Ensure the modal/card takes full screen on mobile when in camera mode */
+@media screen and (max-width: 768px) {
+    .handwritten-capture-container:has(.camera-view) {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .capture-card:has(.camera-view) {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .capture-card:has(.camera-view) h2 {
+        display: none;
+        /* Hide header in camera mode to save space */
+    }
+
+    .capture-ui:has(.camera-view) {
+        height: 100%;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    /* Camera View takes up full remaining space */
+    .camera-view {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: #000;
+    }
+
+    /* Video fills the container completely */
+    .video-container {
+        flex: 1;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        margin: 0;
+        background: black;
+    }
+
+    .camera-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* Ensures video fills screen without black bars */
+    }
+
+    /* WIDER Horizontal Frame for Order Slips */
+    .capture-frame {
+        width: 90%;
+        /* Wider frame */
+        height: 50%;
+        /* Adjusted height */
+        max-height: 400px;
+        /* aspect-ratio: 4/3; Optional: enforce aspect ratio if needed */
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+        /* Darker overlay */
+    }
+
+    .camera-hint {
+        position: absolute;
+        top: 2rem;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: white;
+        z-index: 5;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        padding: 0 1rem;
+        pointer-events: none;
+    }
+
+    /* Fixed Bottom Controls */
+    .camera-actions {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        padding: 1.5rem 1rem calc(1.5rem + env(safe-area-inset-bottom));
+        z-index: 10;
+        gap: 2rem;
+    }
+
+    .camera-actions .button {
+        flex: 1;
+        max-width: 160px;
+    }
+}
