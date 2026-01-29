@@ -12,6 +12,7 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
     const [loading, setLoading] = useState(false);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
+    const frameRef = useRef(null); // Reference to the visual capture frame
     const streamRef = useRef(null);
     const [capturedImage, setCapturedImage] = useState(null);
     const [isSecureContext, setIsSecureContext] = useState(true);
@@ -161,29 +162,70 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
     };
 
     const capturePhoto = () => {
-        if (!videoRef.current || !canvasRef.current) return;
+        if (!videoRef.current || !canvasRef.current || !frameRef.current) return;
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
+        const frame = frameRef.current;
         const context = canvas.getContext('2d');
 
-        // Calculate scale to fit within max dimensions (optimized for OCR + performance)
-        const MAX_WIDTH = 800; // Reduced from 1024 for faster upload
-        let width = video.videoWidth;
-        let height = video.videoHeight;
+        // Dimensions of the raw video source
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
 
-        if (width > MAX_WIDTH) {
-            const scaleFactor = MAX_WIDTH / width;
-            width = MAX_WIDTH;
-            height = height * scaleFactor;
+        // Dimensions of the video element on screen
+        const videoRect = video.getBoundingClientRect();
+        const sw = videoRect.width;
+        const sh = videoRect.height;
+
+        // Calculate Scale (object-fit: cover logic)
+        // 'cover' scales the video to cover the element, cropping excess.
+        const scale = Math.max(sw / vw, sh / vh);
+
+        // Calculate the "Visual Offset" (amount of video hidden/cropped by CSS)
+        // e.g. if scaled video is wider than screen, offsetX > 0
+        const scaledVideoWidth = vw * scale;
+        const scaledVideoHeight = vh * scale;
+        const offsetX = (scaledVideoWidth - sw) / 2;
+        const offsetY = (scaledVideoHeight - sh) / 2;
+
+        // Dimensions of the Capture Frame relative to the Video Element
+        const frameRect = frame.getBoundingClientRect();
+
+        // Calculate the frame's position relative to the video element top-left
+        const frameX = frameRect.left - videoRect.left;
+        const frameY = frameRect.top - videoRect.top;
+        const frameW = frameRect.width;
+        const frameH = frameRect.height;
+
+        // Map Frame coordinates to Source Video coordinates
+        // sX = (FrameX + CSS_Crop_Offset) / Scale
+        const sx = (frameX + offsetX) / scale;
+        const sy = (frameY + offsetY) / scale;
+        const sWidth = frameW / scale;
+        const sHeight = frameH / scale;
+
+        // Set output size (can limit max resolution here if needed)
+        // For consistent quality, use the calculated source dimensions or a multiple
+        // Let's cap max width for upload performance
+        const MAX_OUTPUT_WIDTH = 1200;
+        let outputWidth = sWidth;
+        let outputHeight = sHeight;
+
+        if (outputWidth > MAX_OUTPUT_WIDTH) {
+            const resizeScale = MAX_OUTPUT_WIDTH / outputWidth;
+            outputWidth = MAX_OUTPUT_WIDTH;
+            outputHeight = outputHeight * resizeScale;
         }
 
-        // Set canvas size to scaled dimensions
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = outputWidth;
+        canvas.height = outputHeight;
 
-        // Draw video frame to canvas with scaling
-        context.drawImage(video, 0, 0, width, height);
+        // Draw the cropped portion from source to canvas
+        context.drawImage(video,
+            sx, sy, sWidth, sHeight,  // Source crop
+            0, 0, outputWidth, outputHeight // Destination on canvas
+        );
 
         // Get image as base64 with optimized quality (0.6) for faster upload
         const imageData = canvas.toDataURL('image/jpeg', 0.6);
@@ -391,7 +433,7 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
                         <div className="camera-view fade-in">
                             <div className="video-container">
                                 <video ref={videoRef} autoPlay playsInline className="camera-preview" />
-                                <div className="capture-frame">
+                                <div className="capture-frame" ref={frameRef}>
                                     <div className="frame-corner top-left"></div>
                                     <div className="frame-corner top-right"></div>
                                     <div className="frame-corner bottom-left"></div>
@@ -400,11 +442,13 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
                             </div>
                             <p className="camera-hint">Position the order slip within the frame</p>
                             <div className="camera-actions">
-                                <button className="button button-ghost" onClick={cancelCapture}>Cancel</button>
-                                <button className="button button-capture" onClick={capturePhoto}>
-                                    <span className="capture-icon">📷</span>
-                                    Capture
+                                <button className="button button-circle btn-cancel" onClick={cancelCapture} aria-label="Cancel">
+                                    <span>✕</span>
                                 </button>
+                                <button className="button button-circle btn-capture" onClick={capturePhoto} aria-label="Capture">
+                                    <span>✓</span>
+                                </button>
+                                {/* Spacer or toggle flash in future? For now just 2 buttons centered by flex */}
                             </div>
                         </div>
                     )}

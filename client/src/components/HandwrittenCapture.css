@@ -654,11 +654,12 @@
 }
 
 /* =========================================
-   MOBILE CAMERA OPTIMIZATION
+   MOBILE CAMERA OPTIMIZATION (SPLIT SCREEN)
    ========================================= */
 
-/* Ensure the modal/card takes full screen on mobile when in camera mode */
 @media screen and (max-width: 768px) {
+
+    /* Main Container: Full viewport, no scroll */
     .handwritten-capture-container:has(.camera-view) {
         padding: 0;
         margin: 0;
@@ -666,6 +667,13 @@
         max-width: 100%;
         height: 100vh;
         overflow: hidden;
+        position: fixed;
+        /* Force fixed to viewport */
+        top: 0;
+        left: 0;
+        z-index: 999;
+        /* Ensure on top of all nav */
+        background: #000;
     }
 
     .capture-card:has(.camera-view) {
@@ -675,87 +683,137 @@
         padding: 0;
         display: flex;
         flex-direction: column;
+        background: transparent;
+        box-shadow: none;
     }
 
+    /* Hide Header */
     .capture-card:has(.camera-view) h2 {
         display: none;
-        /* Hide header in camera mode to save space */
     }
 
     .capture-ui:has(.camera-view) {
-        height: 100%;
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    /* Camera View takes up full remaining space */
-    .camera-view {
-        position: relative;
+        flex: 1;
         width: 100%;
         height: 100%;
         display: flex;
         flex-direction: column;
-        background: #000;
+        justify-content: flex-start;
     }
 
-    /* Video fills the container completely */
-    .video-container {
-        flex: 1;
+    /* === SPLIT LAYOUT === */
+
+    .camera-view {
+        display: flex;
+        flex-direction: column;
         width: 100%;
         height: 100%;
-        border-radius: 0;
-        margin: 0;
-        background: black;
+        position: relative;
+    }
+
+    /* TOP SECTION: Camera Preview (~65%) */
+    .video-container {
+        flex: 65;
+        /* 65% height */
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        background: #000;
+        border-radius: 0 0 24px 24px;
+        /* Rounded bottom corners for style */
+        z-index: 2;
     }
 
     .camera-preview {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        /* Ensures video fills screen without black bars */
     }
 
-    /* WIDER Horizontal Frame for Order Slips */
+    /* WIDE SCOPE FRAME */
     .capture-frame {
-        width: 90%;
-        /* Wider frame */
-        height: 50%;
-        /* Adjusted height */
-        max-height: 400px;
-        /* aspect-ratio: 4/3; Optional: enforce aspect ratio if needed */
-        border: 2px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
-        /* Darker overlay */
+        width: 92%;
+        /* Almost full width */
+        height: 90%;
+        /* tall enough to look like a frame */
+        max-height: 80%;
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        /* Dimmed overlay */
+        border-radius: 12px;
     }
 
     .camera-hint {
         position: absolute;
-        top: 2rem;
+        top: 1.5rem;
         left: 0;
         width: 100%;
         text-align: center;
-        color: white;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
         z-index: 5;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
         padding: 0 1rem;
-        pointer-events: none;
+        background: rgba(0, 0, 0, 0.3);
+        padding-top: 5px;
+        padding-bottom: 5px;
     }
 
     /* Fixed Bottom Controls */
     .camera-actions {
-        position: absolute;
-        bottom: 0;
-        left: 0;
+        flex: 35;
         width: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
-        padding: 1.5rem 1rem calc(1.5rem + env(safe-area-inset-bottom));
+        position: relative;
+        background: var(--bg-card);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        align-items: center;
+        padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
+        gap: 1.5rem;
         z-index: 10;
-        gap: 2rem;
     }
 
-    .camera-actions .button {
-        flex: 1;
-        max-width: 160px;
+    /* Common Circle Button Style */
+    .camera-actions .button-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.1s, box-shadow 0.2s;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        font-size: 2rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    .camera-actions .button-circle:active {
+        transform: scale(0.92);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Cancel Button (Red X) */
+    .camera-actions .btn-cancel {
+        background: #ef4444;
+        /* Red */
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Capture Button (Green Check) */
+    .camera-actions .btn-capture {
+        background: #22c55e;
+        /* Green */
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dark mode adjustments */
+    [data-theme='dark'] .camera-actions {
+        background: #0f172a;
+        border-top: 1px solid #1e293b;
     }
 }
