@@ -67,6 +67,13 @@
     grid-area: products;
 }
 
+.card-header h3 {
+    margin: 0 0 15px 0;
+    color: #1f2937;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
 .debt-card {
     grid-area: debt;
 }
