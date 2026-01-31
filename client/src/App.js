@@ -231,7 +231,6 @@ function App() {
     <div className="App">
       <div className="container main-content">
         <header className="app-header">
-          <h1>📝 Order Capture System</h1>
           <p>Capture handwritten orders for customers</p>
           {isInstallable && (
             <button key="install-btn" onClick={handleInstallClick} className="install-button">

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">E-Debt</string>
+    <string name="title_activity_main">E-Debt</string>
+    <string name="package_name">com.edebt.app</string>
+    <string name="custom_url_scheme">com.edebt.app</string>
+</resources>
