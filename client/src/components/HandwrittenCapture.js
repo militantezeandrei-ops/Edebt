@@ -395,7 +395,7 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
     return (
         <div className="handwritten-capture-container">
             <div className="card capture-card">
-                <h2>📝 Capture Order Slip</h2>
+                <h2>📝 Capture Item Slip</h2>
 
                 {error && (
                     <div className={`error-message ${!isSecureContext ? 'warning-bg' : ''}`}>
@@ -417,11 +417,11 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
                         <div className="capture-buttons fade-in">
                             <button className="capture-btn camera-btn" onClick={startCamera}>
                                 <span className="btn-icon">📸</span>
-                                Capture Order Slip
+                                Capture Item Slip
                             </button>
 
                             <p className="capture-instruction">
-                                Take a photo of handwritten order slip
+                                Take a photo of handwritten Item slip
                             </p>
                         </div>
                     )}
@@ -462,7 +462,7 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
                             <div className="preview-actions">
                                 <button className="button button-ghost" onClick={retakePhoto}>Retake</button>
                                 <button className="button button-primary" onClick={processImage}>
-                                    Process Order
+                                    Extract Order
                                 </button>
                             </div>
                         </div>
@@ -472,64 +472,73 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
                     {captureMode === 'results' && (
                         <div className="results-view fade-in">
                             <div className="results-header">
-                                <h3>📋 Detected Orders ({detectedOrders.length})</h3>
+                                <h3>📋 Detected Items ({detectedOrders.length})</h3>
                             </div>
 
                             <div className="orders-list">
-                                {detectedOrders.map((order) => (
-                                    <div key={order.id} className={`order-card ${order.status === 'saved' ? 'saved' : ''}`}>
-                                        <div className="order-card-header">
-                                            {order.validatedCustomer ? (
-                                                <div className="customer-info">
-                                                    <span className="customer-name">{order.validatedCustomer.name}</span>
-                                                    <span className="confidence-pill" style={{
-                                                        backgroundColor: order.customerConfidence > 0.8 ? '#10b981' : '#f59e0b'
-                                                    }}>
-                                                        {Math.round(order.customerConfidence * 100)}%
-                                                    </span>
-                                                </div>
-                                            ) : (
-                                                <div className="customer-info unknown">
-                                                    <span className="customer-name">Unknown: "{order.originalName}"</span>
-                                                    <span className="confidence-pill red">New?</span>
+                                {detectedOrders.map((order) => {
+                                    const orderTotal = order.items.reduce((sum, item) =>
+                                        sum + (parseFloat(item.validatedPrice || item.originalPrice) || 0), 0);
+
+                                    return (
+                                        <div key={order.id} className={`order-card ${order.status === 'saved' ? 'saved' : ''}`}>
+                                            <div className="order-card-header">
+                                                {order.validatedCustomer ? (
+                                                    <div className="customer-info">
+                                                        <span className="customer-name">{order.validatedCustomer.name}</span>
+                                                        <span className="confidence-pill" style={{
+                                                            backgroundColor: order.customerConfidence > 0.8 ? '#10b981' : '#f59e0b'
+                                                        }}>
+                                                            {Math.round(order.customerConfidence * 100)}%
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="customer-info unknown">
+                                                        <span className="customer-name">Unknown: "{order.originalName}"</span>
+                                                        <span className="confidence-pill red">New?</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Full-width Editable Items List */}
+                                            <div className="editable-items-list">
+                                                {order.items.map((item, idx) => (
+                                                    <div key={idx} className="editable-item-row">
+                                                        <input
+                                                            type="text"
+                                                            className="item-name-input"
+                                                            value={item.validatedName || item.originalName}
+                                                            onChange={(e) => updateOrderItem(order.id, idx, 'name', e.target.value)}
+                                                            disabled={order.status === 'saved'}
+                                                            placeholder="Item name"
+                                                        />
+                                                        <input
+                                                            type="number"
+                                                            className="item-price-input"
+                                                            value={item.validatedPrice || item.originalPrice || ''}
+                                                            onChange={(e) => updateOrderItem(order.id, idx, 'price', e.target.value)}
+                                                            disabled={order.status === 'saved'}
+                                                            placeholder="Price"
+                                                        />
+                                                    </div>
+                                                ))}
+                                                {order.items.length === 0 && <p className="empty">No items detected</p>}
+                                            </div>
+
+                                            {/* Total Amount */}
+                                            <div className="order-total-row">
+                                                <span>Total:</span>
+                                                <span className="order-total-value">₱{orderTotal.toFixed(2)}</span>
+                                            </div>
+
+                                            {order.status !== 'saved' && !order.validatedCustomer && (
+                                                <div className="card-actions">
+                                                    <button className="btn-create" onClick={() => confirmGenericOrder(order)}>➕ Create Customer</button>
                                                 </div>
                                             )}
-
-                                            {order.status === 'saved' && <span className="status-badge">✅ Saved</span>}
                                         </div>
-
-                                        {/* Editable Items List */}
-                                        <div className="editable-items-list">
-                                            {order.items.map((item, idx) => (
-                                                <div key={idx} className="editable-item-row">
-                                                    <input
-                                                        type="text"
-                                                        className="item-name-input"
-                                                        value={item.validatedName || item.originalName}
-                                                        onChange={(e) => updateOrderItem(order.id, idx, 'name', e.target.value)}
-                                                        disabled={order.status === 'saved'}
-                                                        placeholder="Item name"
-                                                    />
-                                                    <input
-                                                        type="number"
-                                                        className="item-price-input"
-                                                        value={item.validatedPrice || item.originalPrice || ''}
-                                                        onChange={(e) => updateOrderItem(order.id, idx, 'price', e.target.value)}
-                                                        disabled={order.status === 'saved'}
-                                                        placeholder="Price"
-                                                    />
-                                                </div>
-                                            ))}
-                                            {order.items.length === 0 && <p className="empty">No items detected</p>}
-                                        </div>
-
-                                        {order.status !== 'saved' && !order.validatedCustomer && (
-                                            <div className="card-actions">
-                                                <button className="btn-create" onClick={() => confirmGenericOrder(order)}>➕ Create Customer</button>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {/* Bottom Actions */}
@@ -539,12 +548,11 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
                                     className="button button-primary"
                                     onClick={confirmAllValid}
                                     disabled={
-                                        // Disable if no valid orders to save OR if there are any unknown/invalid orders pending
                                         !detectedOrders.some(o => o.validatedCustomer && o.status !== 'saved') ||
                                         detectedOrders.some(o => !o.validatedCustomer && o.status !== 'saved')
                                     }
                                 >
-                                    💾 Save All
+                                    💾 Save All Items
                                 </button>
                             </div>
 

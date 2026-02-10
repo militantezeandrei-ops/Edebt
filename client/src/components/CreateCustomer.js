@@ -10,17 +10,10 @@ const CreateCustomer = ({ scannedId, onCustomerCreated, onCancel }) => {
   // scannedId here is actually the Name extracted from OCR in the "Customer Not Found" flow
   const [name, setName] = useState(scannedId || '');
 
-  // Generate a random unique ID (simulating auto-increment/unique logic).
-  // In a real production app, the backend might assign a sequence number.
-  // Here we use a timestamp-based ID to ensure uniqueness.
   const [generatedId, setGeneratedId] = useState(() => {
     return 'C-' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 1000);
   });
 
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-
-  // ... rest of state ...
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -46,8 +39,6 @@ const CreateCustomer = ({ scannedId, onCustomerCreated, onCancel }) => {
     const customerData = {
       unique_id: generatedId,
       name: name.trim() || null,
-      email: email.trim() || null,
-      phone: phone.trim() || null,
       balance: 0
     };
 
@@ -155,28 +146,6 @@ const CreateCustomer = ({ scannedId, onCustomerCreated, onCancel }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter customer name"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email (optional)"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="phone">Phone</label>
-            <input
-              type="tel"
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Enter phone number (optional)"
             />
           </div>
 

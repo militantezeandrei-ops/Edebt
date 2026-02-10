@@ -76,8 +76,8 @@ App opens at: `http://localhost:3000`
 ## Usage
 
 ### 📝 Capturing Handwritten Orders
-1. Navigate to the **"Capture Order"** tab.
-2. Click **"Capture Order Slip"**.
+1. Navigate to the **"Capture "** tab.
+2. Click **""**.
 3. Take a clear photo of the handwritten note.
 4. The system will use **Cloud-based OCR** to read the text.
 5. Review the detected items and prices.

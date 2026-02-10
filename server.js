@@ -19,6 +19,7 @@ const connectDB = require('./config/database');
 const Customer = require('./models/Customer');
 const Order = require('./models/Order');
 const MenuItem = require('./models/MenuItem');
+const User = require('./models/User');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -73,6 +74,52 @@ app.use((req, res, next) => {
     }
   });
   next();
+});
+
+// --- Role-based middleware ---
+const requireRole = (...roles) => {
+  return (req, res, next) => {
+    const userRole = req.headers['x-user-role'];
+    if (!userRole || !roles.includes(userRole)) {
+      return res.status(403).json({ error: 'Access denied. Insufficient permissions.' });
+    }
+    next();
+  };
+};
+
+// --- Auth Endpoints ---
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+    const user = await User.findOne({ username: username.toLowerCase(), is_active: true });
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        username: user.username,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get current user list (admin only)
+app.get('/api/auth/users', requireRole('admin'), async (req, res) => {
+  try {
+    const users = await User.find().select('-password').sort({ role: 1, username: 1 });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API Routes
@@ -299,6 +346,138 @@ app.post('/api/orders/batch', async (req, res) => {
     });
   } catch (err) {
     console.error('Error creating batch orders:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Customer Update/Delete/Payment Endpoints (Admin only) ---
+
+// Update customer
+app.put('/api/customer/:id', requireRole('admin'), async (req, res) => {
+  try {
+    const { name, email, phone, balance, is_active } = req.body;
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+    if (balance !== undefined) updateData.balance = parseFloat(balance);
+    if (is_active !== undefined) updateData.is_active = is_active;
+
+    const customer = await Customer.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!customer) return res.status(404).json({ error: 'Customer not found' });
+    res.json(customer);
+  } catch (err) {
+    console.error('Error updating customer:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete customer (admin only)
+app.delete('/api/customer/:id', requireRole('admin'), async (req, res) => {
+  try {
+    // Also delete associated orders
+    const customer = await Customer.findById(req.params.id);
+    if (!customer) return res.status(404).json({ error: 'Customer not found' });
+
+    await Order.deleteMany({ customer_id: customer._id });
+    await Customer.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Customer and associated orders deleted' });
+  } catch (err) {
+    console.error('Error deleting customer:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Record a payment for a customer (admin only)
+app.post('/api/customer/:id/payment', requireRole('admin'), async (req, res) => {
+  try {
+    const { amount, note } = req.body;
+    const paymentAmount = parseFloat(amount);
+
+    if (!paymentAmount || paymentAmount <= 0) {
+      return res.status(400).json({ error: 'Valid payment amount is required' });
+    }
+
+    const customer = await Customer.findById(req.params.id);
+    if (!customer) return res.status(404).json({ error: 'Customer not found' });
+
+    // Reduce balance by payment amount
+    const newBalance = Math.max(0, customer.balance - paymentAmount);
+    customer.balance = newBalance;
+    customer.last_transaction_date = new Date();
+    await customer.save();
+
+    // Create a payment order record
+    const paymentOrder = new Order({
+      customer_id: customer._id,
+      customer_unique_id: customer.unique_id,
+      order_name: `Payment Received`,
+      order_description: note || `Payment of ₱${paymentAmount.toFixed(2)}`,
+      order_amount: -paymentAmount, // Negative to indicate payment
+      order_status: 'completed'
+    });
+    await paymentOrder.save();
+
+    res.json({
+      success: true,
+      customer,
+      payment: paymentOrder,
+      previousBalance: customer.balance + paymentAmount,
+      newBalance: customer.balance
+    });
+  } catch (err) {
+    console.error('Error recording payment:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Order Status Update ---
+app.put('/api/order/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['pending', 'processing', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { order_status: status },
+      { new: true }
+    ).populate('customer_id', 'name email');
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    res.json(order);
+  } catch (err) {
+    console.error('Error updating order status:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Data Export Endpoints (Admin only) ---
+app.get('/api/export/customers', requireRole('admin'), async (req, res) => {
+  try {
+    const customers = await Customer.find().sort({ name: 1 }).lean();
+    res.json(customers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/export/orders', requireRole('admin'), async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .sort({ createdAt: -1 })
+      .populate('customer_id', 'name email unique_id')
+      .lean();
+
+    const formatted = orders.map(o => ({
+      ...o,
+      customer_name: o.customer_id?.name || 'Unknown',
+      customer_email: o.customer_id?.email || '',
+      customer_unique_id_ref: o.customer_id?.unique_id || o.customer_unique_id
+    }));
+    res.json(formatted);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

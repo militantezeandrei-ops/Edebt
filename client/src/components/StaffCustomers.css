@@ -1,0 +1,234 @@
+.staff-customers {
+    padding: 12px 16px;
+}
+
+.staff-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+}
+
+.staff-search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e2e8f0;
+    font-size: 15px;
+}
+
+.staff-stat-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.staff-stat {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+}
+
+.ss-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.ss-label {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.staff-customer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 100px;
+}
+
+.staff-customer-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.staff-customer-card.expanded {
+    border-color: rgba(99, 102, 241, 0.4);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.scc-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.scc-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.scc-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.scc-name {
+    display: block;
+    font-weight: 600;
+    color: #f1f5f9;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scc-id {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.scc-balance {
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.scc-balance.debt {
+    color: #f87171;
+}
+
+.scc-balance.clear {
+    color: #34d399;
+}
+
+.scc-expand {
+    color: #64748b;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+/* Expandable Drawer */
+.scc-drawer {
+    padding: 0 16px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+
+    to {
+        opacity: 1;
+        max-height: 500px;
+    }
+}
+
+.scc-drawer h5 {
+    color: #94a3b8;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 12px 0 8px;
+}
+
+.scc-order-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.scc-order-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+}
+
+.scc-order-item:last-child {
+    border-bottom: none;
+}
+
+.scc-order-date {
+    color: #64748b;
+    font-size: 11px;
+    min-width: 70px;
+    flex-shrink: 0;
+}
+
+.scc-order-desc {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.scc-item-tag {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.scc-order-amt {
+    font-weight: 600;
+    color: #f87171;
+    flex-shrink: 0;
+    font-size: 13px;
+}
+
+.scc-order-amt.payment {
+    color: #34d399;
+}
+
+.scc-empty-orders {
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+    padding: 12px 0;
+}
+
+.staff-empty {
+    text-align: center;
+    color: #64748b;
+    padding: 40px 20px;
+}
+
+.staff-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+}

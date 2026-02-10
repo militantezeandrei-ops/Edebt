@@ -21,6 +21,9 @@ const connectDB = async () => {
     // Initialize sample data if database is empty
     await initializeSampleData();
 
+    // Seed default users (admin/staff) if they don't exist
+    await seedDefaultUsers();
+
     return conn;
   } catch (error) {
     console.error('Error connecting to MongoDB:', error.message);
@@ -48,6 +51,24 @@ const initializeSampleData = async () => {
     }
   } catch (error) {
     console.error('Error initializing sample data:', error.message);
+  }
+};
+
+const seedDefaultUsers = async () => {
+  try {
+    const User = require('../models/User');
+    const adminExists = await User.findOne({ username: 'admin' });
+    if (!adminExists) {
+      await User.create({ username: 'admin', password: 'admin123', role: 'admin' });
+      console.log('✅ Default admin user created (admin/admin123)');
+    }
+    const staffExists = await User.findOne({ username: 'staff' });
+    if (!staffExists) {
+      await User.create({ username: 'staff', password: 'staff123', role: 'staff' });
+      console.log('✅ Default staff user created (staff/staff123)');
+    }
+  } catch (error) {
+    console.error('Error seeding users:', error.message);
   }
 };
 

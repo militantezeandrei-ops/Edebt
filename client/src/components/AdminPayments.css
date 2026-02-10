@@ -1,0 +1,342 @@
+.admin-payments {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 900px) {
+    .admin-payments {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Unified Card Style for both sections */
+.payment-card {
+    background: var(--card-bg, #1a1a2e);
+    border: 1px solid var(--border-color, #2a2a3e);
+    border-radius: 16px;
+    padding: 24px;
+    height: fit-content;
+}
+
+.payment-card h3 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    color: #f1f5f9;
+}
+
+/* Payment Fields */
+.pay-field {
+    margin-bottom: 16px;
+}
+
+.pay-field label {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.pay-field input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color, #333);
+    border-radius: 10px;
+    background: var(--bg-primary, #0f0f1a);
+    color: var(--text-primary, #fff);
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.pay-field input:focus {
+    border-color: #6366f1;
+    outline: none;
+}
+
+/* Selected Customer */
+.selected-customer {
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+.sc-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sc-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.sc-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sc-name {
+    font-weight: 600;
+    color: #f1f5f9;
+    font-size: 14px;
+}
+
+.sc-balance {
+    font-size: 13px;
+    color: #ef4444;
+}
+
+.btn-change {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #94a3b8;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s;
+}
+
+.btn-change:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+}
+
+/* Customer Selector Dropdown */
+.customer-selector {
+    position: relative;
+}
+
+.customer-selector input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color, #333);
+    border-radius: 10px;
+    background: var(--bg-primary, #0f0f1a);
+    color: var(--text-primary, #fff);
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.customer-dropdown {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color, #2a2a3e);
+    border-radius: 10px;
+    margin-top: 4px;
+    background: var(--card-bg, #1a1a2e);
+}
+
+.dropdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border: none;
+    background: none;
+    color: var(--text-primary, #fff);
+    width: 100%;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    transition: background 0.15s;
+}
+
+.dropdown-item:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.dd-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dd-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.dd-name {
+    color: #e2e8f0;
+}
+
+.dd-balance {
+    color: #ef4444;
+    font-weight: 600;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.dropdown-empty {
+    padding: 14px;
+    text-align: center;
+    color: var(--text-secondary, #888);
+    font-size: 13px;
+}
+
+.payment-preview {
+    font-size: 13px;
+    color: #10b981;
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+.btn-record-payment {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+}
+
+.btn-record-payment:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+.btn-record-payment:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Debt Summary */
+.debt-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ds-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+}
+
+.ds-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.ds-label {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+}
+
+/* Debt List */
+.debt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.debt-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+}
+
+.debt-item:hover {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.debt-item.selected {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: #6366f1;
+}
+
+.di-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+.di-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.di-name {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: #f1f5f9;
+}
+
+.di-date {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary, #888);
+}
+
+.di-amount {
+    font-weight: 700;
+    color: #ef4444;
+    font-size: 15px;
+}

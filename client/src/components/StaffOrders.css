@@ -1,0 +1,105 @@
+.staff-orders {
+    animation: fadeIn 0.3s ease;
+}
+
+.staff-filter-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+}
+
+.staff-filter-btn {
+    padding: 8px 14px;
+    border: 1px solid var(--border-color, #333);
+    border-radius: 20px;
+    background: none;
+    color: var(--text-secondary, #888);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.staff-filter-btn.active {
+    background: rgba(99, 102, 241, 0.15);
+    color: #a78bfa;
+    border-color: #6366f1;
+    font-weight: 600;
+}
+
+.staff-order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.staff-order-card {
+    background: var(--card-bg, #1a1a2e);
+    border: 1px solid var(--border-color, #2a2a3e);
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.soc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.soc-name {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.soc-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.soc-desc {
+    font-size: 13px;
+    color: var(--text-secondary, #888);
+    margin: 4px 0 8px;
+    line-height: 1.4;
+}
+
+.soc-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-secondary, #aaa);
+    margin-bottom: 8px;
+}
+
+.soc-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.soc-date {
+    font-size: 11px;
+    color: var(--text-secondary, #666);
+}
+
+.soc-process-btn {
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.soc-process-btn:hover {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}

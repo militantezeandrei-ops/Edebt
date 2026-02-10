@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import API_URL from '../config/api';
 import Swal from 'sweetalert2';
 import './Login.css';
 
@@ -7,6 +9,7 @@ const Login = ({ onLogin }) => {
     const [password, setPassword] = useState('');
     const [attempts, setAttempts] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     // On mount: Check localStorage for existing lockout
     useEffect(() => {
@@ -40,7 +43,7 @@ const Login = ({ onLogin }) => {
         return () => clearInterval(timer);
     }, [timeLeft]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (timeLeft > 0) return; // Prevent submission while locked
@@ -54,31 +57,45 @@ const Login = ({ onLogin }) => {
                 confirmButtonColor: '#4f46e5',
                 timer: 2000
             });
-            return; // Don't count this as an attempt
+            return;
         }
 
-        // Simple hardcoded check
-        if (username === 'admin' && password === 'admin123') {
-            onLogin();
-            Swal.fire({
-                icon: 'success',
-                title: 'Welcome back!',
-                text: 'Login successful',
-                timer: 1500,
-                showConfirmButton: false
+        setLoading(true);
+
+        try {
+            const response = await axios.post(`${API_URL}/api/auth/login`, {
+                username: username.trim(),
+                password: password.trim()
             });
-            setAttempts(0);
-            setUsername('');
-            setPassword('');
-            localStorage.removeItem('loginLockoutEnd');
-        } else {
+
+            if (response.data.success) {
+                const { role, username: uname } = response.data.user;
+                localStorage.setItem('userRole', role);
+                localStorage.setItem('username', uname);
+                onLogin(role);
+                Swal.fire({
+                    icon: 'success',
+                    title: role === 'admin' ? 'Welcome, Admin!' : 'Welcome, Staff!',
+                    text: `Logged in as ${uname}`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                setAttempts(0);
+                setUsername('');
+                setPassword('');
+                localStorage.removeItem('loginLockoutEnd');
+            }
+        } catch (err) {
+            console.error('Login Error:', err);
+            const errorMessage = err.response?.data?.error || err.message || 'Connection failed';
+
             const newAttempts = attempts + 1;
             setAttempts(newAttempts);
-            setUsername(''); // Clear username field
-            setPassword(''); // Clear password field
+            setUsername('');
+            setPassword('');
 
             if (newAttempts >= 3) {
-                const lockoutEnd = Date.now() + 30000; // 30 seconds from now
+                const lockoutEnd = Date.now() + 30000;
                 localStorage.setItem('loginLockoutEnd', lockoutEnd.toString());
                 setTimeLeft(30);
                 Swal.fire({
@@ -90,12 +107,14 @@ const Login = ({ onLogin }) => {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Access Denied',
-                    text: `Invalid credentials. ${3 - newAttempts} attempts remaining.`,
+                    title: 'Login Failed',
+                    text: `${errorMessage}. ${3 - newAttempts} attempts remaining.`,
                     confirmButtonColor: '#ef4444',
-                    timer: 1500
+                    footer: `<small>Backend: ${API_URL}</small>`
                 });
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -105,9 +124,11 @@ const Login = ({ onLogin }) => {
         <div className="login-container">
             <div className="login-card glass-panel">
                 <div className="login-header">
-                    <div className="app-logo">🔒</div>
-                    <h2>Admin Access</h2>
-                    <p>{isLocked ? `Try again in ${timeLeft}s` : 'Please sign in to continue'}</p>
+                    <div className="app-logo">🔐</div>
+                    <h2>E-Debt System</h2>
+                    <p className="login-subtitle">
+                        {isLocked ? `Try again in ${timeLeft}s` : 'Sign in to continue'}
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit} autoComplete="off">
@@ -118,8 +139,8 @@ const Login = ({ onLogin }) => {
                             className="login-input"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Enter username"
-                            disabled={isLocked}
+                            placeholder="admin or staff"
+                            disabled={isLocked || loading}
                             autoComplete="off"
                             name="login-username-field"
                         />
@@ -133,16 +154,21 @@ const Login = ({ onLogin }) => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter password"
-                            disabled={isLocked}
+                            disabled={isLocked || loading}
                             autoComplete="off"
                             name="login-password-field"
                         />
                     </div>
 
-                    <button type="submit" className="login-btn" disabled={isLocked}>
-                        {isLocked ? `Locked (${timeLeft}s)` : 'Sign In'}
+                    <button type="submit" className="login-btn" disabled={isLocked || loading}>
+                        {loading ? 'Signing in...' : isLocked ? `Locked (${timeLeft}s)` : 'Sign In'}
                     </button>
                 </form>
+
+                <div className="login-footer">
+                    <p className="role-hint">👤 Admin — Full dashboard access</p>
+                    <p className="role-hint">📱 Staff — Mobile order capture</p>
+                </div>
             </div>
         </div>
     );
