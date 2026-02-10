@@ -122,6 +122,16 @@ app.get('/api/auth/users', requireRole('admin'), async (req, res) => {
   }
 });
 
+// Temporary Debug Endpoint (Remove after fixing login)
+app.get('/api/debug/users', async (req, res) => {
+  try {
+    const users = await User.find({}).select('username role');
+    res.json({ count: users.length, users });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // API Routes
 
 // Get customer by unique ID
