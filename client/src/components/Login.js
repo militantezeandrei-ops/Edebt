@@ -10,6 +10,7 @@ const Login = ({ onLogin }) => {
     const [attempts, setAttempts] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'online', 'offline'
 
     // On mount: Check localStorage for existing lockout
     useEffect(() => {
@@ -42,6 +43,26 @@ const Login = ({ onLogin }) => {
         }
         return () => clearInterval(timer);
     }, [timeLeft]);
+
+    // Server Health Check
+    useEffect(() => {
+        const checkServer = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/api/health`, { timeout: 5000 });
+                if (res.data.status === 'OK') {
+                    setServerStatus('online');
+                } else {
+                    setServerStatus('offline');
+                }
+            } catch (err) {
+                setServerStatus('offline');
+            }
+        };
+
+        checkServer();
+        const interval = setInterval(checkServer, 10000); // Check every 10s
+        return () => clearInterval(interval);
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -124,6 +145,13 @@ const Login = ({ onLogin }) => {
         <div className="login-container">
             <div className="login-card glass-panel">
                 <div className="login-header">
+                    <div className="status-indicator-container">
+                        <div className={`status-dot ${serverStatus}`}></div>
+                        <span className="status-text">
+                            {serverStatus === 'checking' ? 'Checking connection...' :
+                                serverStatus === 'online' ? 'System Online' : 'System Offline (Render waking up...)'}
+                        </span>
+                    </div>
                     <div className="app-logo">🔐</div>
                     <h2>E-Debt System</h2>
                     <p className="login-subtitle">
