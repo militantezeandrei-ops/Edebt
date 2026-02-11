@@ -21,8 +21,16 @@ const getApiUrl = () => {
 
     // Fallback: try same origin (won't work for Netlify, but might work for other deployments)
     const url = window.location.origin.replace(':3000', ':5000');
-    console.warn('⚠️ No REACT_APP_API_URL set, using fallback:', url);
-    return url;
+
+    // For Capacitor/Mobile, we MUST have a production URL if not on localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      console.warn('⚠️ No REACT_APP_API_URL set, using fallback:', url);
+      return url;
+    }
+
+    const productionFallback = 'https://edebt.onrender.com';
+    console.log('🚀 Mobile/Production detected: Using hardcoded fallback:', productionFallback);
+    return productionFallback;
   }
 
   // In development, detect IP automatically to support mobile access
