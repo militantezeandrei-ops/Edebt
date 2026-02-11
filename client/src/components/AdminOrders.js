@@ -121,7 +121,7 @@ const AdminOrders = () => {
                                     {order.customer_name || order.customer_unique_id}
                                 </td>
                                 <td className={order.order_amount < 0 ? 'cell-payment' : 'cell-amount'}>
-                                    {order.order_amount < 0 ? '-' : ''}₱{Math.abs(order.order_amount || 0).toFixed(2)}
+                                    {order.order_amount < 0 ? '-' : ''}P {Math.abs(order.order_amount || 0).toFixed(2)}
                                 </td>
                                 <td>
                                     <span className="status-badge" style={{ background: getStatusColor(order.order_status) + '22', color: getStatusColor(order.order_status), borderColor: getStatusColor(order.order_status) }}>

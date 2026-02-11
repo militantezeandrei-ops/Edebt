@@ -12,14 +12,14 @@ const ConnectionTest = () => {
       // 1. Check Browser Connectivity
       if (!navigator.onLine) {
         setStatus('offline');
-        setMessage('Offline Mode');
+        setMessage('Offline');
         return;
       }
 
       // 2. Check Backend
       if (API_URL === 'BACKEND_URL_NOT_SET') {
         setStatus('error');
-        setMessage('Backend Config Missing');
+        setMessage('Config Error');
         return;
       }
 
@@ -34,61 +34,43 @@ const ConnectionTest = () => {
     };
 
     checkStatus();
-    window.addEventListener('online', checkStatus);
-    window.addEventListener('offline', checkStatus);
-    // Interval check every 30s
-    const interval = setInterval(checkStatus, 30000);
-
-    return () => {
-      window.removeEventListener('online', checkStatus);
-      window.removeEventListener('offline', checkStatus);
-      clearInterval(interval);
-    };
+    // ... rest of the logic
   }, []);
-
-  if (status === 'checking') return null; // Don't show anything while checking to reduce flicker
 
   return (
     <div style={{
+      position: 'absolute',
+      top: '12px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 1000,
       display: 'flex',
       justifyContent: 'center',
-      marginBottom: '20px',
       animation: 'fadeIn 0.5s ease'
     }}>
       <div style={{
         display: 'inline-flex',
         alignItems: 'center',
-        padding: '6px 16px',
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(5px)',
+        padding: '6px 14px',
+        backgroundColor: 'rgba(26, 26, 46, 0.85)',
+        backdropFilter: 'blur(10px)',
         borderRadius: '20px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        fontSize: '0.85rem',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+        fontSize: '0.75rem',
         fontWeight: '600',
-        color: '#4b5563',
-        gap: '8px',
-        border: '1px solid rgba(255, 255, 255, 0.5)'
+        color: '#f8fafc',
+        gap: '6px',
+        border: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
         <span style={{
-          width: '8px',
-          height: '8px',
+          width: '6px',
+          height: '6px',
           borderRadius: '50%',
           backgroundColor: status === 'connected' ? '#10b981' : status === 'offline' ? '#f59e0b' : '#ef4444',
           boxShadow: status === 'connected' ? '0 0 8px #10b981' : 'none',
           display: 'block'
         }}></span>
-        {message}
-        {status === 'error' && (
-          <span style={{
-            fontSize: '0.7rem',
-            opacity: 0.7,
-            marginLeft: '5px',
-            borderLeft: '1px solid #ddd',
-            paddingLeft: '5px'
-          }}>
-            ({API_URL})
-          </span>
-        )}
+        {status === 'checking' ? 'Connecting...' : message}
       </div>
     </div>
   );

@@ -22,10 +22,36 @@ const MenuItem = require('./models/MenuItem');
 const User = require('./models/User');
 
 const app = express();
+// Keep-Alive Logic for Render (Free Tier)
+const KEEP_ALIVE_URL = process.env.RENDER_EXTERNAL_URL || 'http://localhost:5000';
+if (process.env.NODE_ENV === 'production') {
+  setInterval(() => {
+    axios.get(`${KEEP_ALIVE_URL}/api/customers`)
+      .then(() => console.log('Keep-alive ping successful'))
+      .catch((err) => console.error('Keep-alive ping failed:', err.message));
+  }, 14 * 60 * 1000); // Ping every 14 minutes
+}
+
+// Port configuration
 const PORT = process.env.PORT || 5000;
+// Note: app.listen is now at the bottom of the file for clean initialization
 
 // Connect to MongoDB
-connectDB();
+connectDB().then(async () => {
+  try {
+    // Data Migration: Clean up all variations of 'N/A' from existing records
+    // Catches "N/A", "n/a", "NA", "N A", "N-A" with word boundaries
+    const result = await Customer.updateMany(
+      { employment_status: { $regex: /\bn\/?-?\s?a\b/i } },
+      { $set: { employment_status: '' } }
+    );
+    if (result.modifiedCount > 0) {
+      console.log(`🧹 Cleaned up ${result.modifiedCount} records with 'N/A' strings (used regex).`);
+    }
+  } catch (err) {
+    console.error('Migration error:', err);
+  }
+});
 
 // Middleware
 // CORS configuration - allow all origins (or specify your Netlify domain)
@@ -87,32 +113,113 @@ const requireRole = (...roles) => {
   };
 };
 
+const ActivityLog = require('./models/ActivityLog');
+
+// ... existing app declaration is at line 24 ...
+
+// --- Activity Logging Helper ---
+const logActivity = async (req, action, details = '') => {
+  try {
+    const username = req.headers['x-username'] || 'Unknown';
+    const user = await User.findOne({ username: username.toLowerCase() });
+    if (user) {
+      await ActivityLog.create({
+        user: user._id,
+        action,
+        details,
+        ip_address: req.ip,
+        user_agent: req.headers['user-agent']
+      });
+    }
+  } catch (err) {
+    console.error('Activity logging failed:', err);
+  }
+};
+
 // --- Auth Endpoints ---
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
+    const user = await User.findOne({ username: username.toLowerCase() });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid username or password' });
     }
-    const user = await User.findOne({ username: username.toLowerCase(), is_active: true });
-    if (!user || user.password !== password) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+
+    if (!user.is_active) {
+      return res.status(403).json({ error: 'Account is deactivated' });
     }
+
+    // Direct password comparison (matching the existing implementation)
+    if (user.password !== password) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
     res.json({
       success: true,
       user: {
-        id: user._id,
         username: user.username,
-        role: user.role
+        role: user.role,
+        is_active: user.is_active
       }
     });
   } catch (err) {
-    console.error('Login error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Get current user list (admin only)
+// --- User Management Endpoints (Admin Only) ---
+
+// Create new user
+app.post('/api/auth/users', requireRole('admin'), async (req, res) => {
+  try {
+    const { username, password, role } = req.body;
+    const existing = await User.findOne({ username: username.toLowerCase() });
+    if (existing) return res.status(400).json({ error: 'Username already exists' });
+
+    const newUser = await User.create({ username, password, role });
+    await logActivity(req, 'Created User', `Admin created ${role}: ${username}`);
+    res.json(newUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update user
+app.put('/api/auth/users/:id', requireRole('admin'), async (req, res) => {
+  try {
+    const { username, password, role, is_active } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (username) user.username = username;
+    if (password) user.password = password;
+    if (role) user.role = role;
+    if (typeof is_active !== 'undefined') user.is_active = is_active;
+
+    await user.save();
+    await logActivity(req, 'Updated User', `Admin updated user: ${user.username}`);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete user
+app.delete('/api/auth/users/:id', requireRole('admin'), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    await User.findByIdAndDelete(req.params.id);
+    await logActivity(req, 'Deleted User', `Admin deleted user: ${user.username}`);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get user list
 app.get('/api/auth/users', requireRole('admin'), async (req, res) => {
   try {
     const users = await User.find().select('-password').sort({ role: 1, username: 1 });
@@ -122,11 +229,14 @@ app.get('/api/auth/users', requireRole('admin'), async (req, res) => {
   }
 });
 
-// Temporary Debug Endpoint (Remove after fixing login)
-app.get('/api/debug/users', async (req, res) => {
+// Get Activity Logs
+app.get('/api/activity/logs', requireRole('admin'), async (req, res) => {
   try {
-    const users = await User.find({}).select('username role');
-    res.json({ count: users.length, users });
+    const logs = await ActivityLog.find()
+      .populate('user', 'username role')
+      .sort({ createdAt: -1 })
+      .limit(100);
+    res.json(logs);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -155,30 +265,43 @@ app.get('/api/customer/:uniqueId', async (req, res) => {
 // Create new customer
 app.post('/api/customer', async (req, res) => {
   try {
-    const { unique_id, name, email, phone } = req.body;
+    console.log('Incoming customer POST:', req.body);
+    const { unique_id, name, email, phone, customer_type, employment_status, payment_status } = req.body;
 
     if (!unique_id) {
       return res.status(400).json({ error: 'Unique ID is required' });
     }
 
-    // Check if customer already exists (by ID) -- KEEP THIS for explicit ID checks
+    // Check if customer already exists (by ID)
     const existingCustomerById = await Customer.findOne({ unique_id });
     if (existingCustomerById) {
-      // If ID exists, just return it (idempotent behavior)
-      return res.json(existingCustomerById);
+      console.log(`Customer with ID ${unique_id} found. Checking for updates...`);
+      // Update even if found by ID to ensure metadata persists
+      if (customer_type) existingCustomerById.customer_type = customer_type;
+      if (employment_status !== undefined) existingCustomerById.employment_status = employment_status;
+      if (payment_status) existingCustomerById.payment_status = payment_status;
+
+      const updated = await existingCustomerById.save();
+      await logActivity(req, 'Update Customer', `Updated metadata for ${name} (${unique_id})`);
+      return res.json(updated);
     }
 
     // NEW: Check if customer name already exists (case-insensitive) to prevent duplicates
     if (name) {
-      // Escape regex characters just in case
       const safeName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const existingByName = await Customer.findOne({
         name: { $regex: new RegExp(`^${safeName}$`, 'i') }
       });
 
       if (existingByName) {
-        console.log(`Prevented duplicate customer creation for: "${name}". Returning existing: ${existingByName.unique_id}`);
-        return res.json(existingByName);
+        console.log(`Customer "${name}" exists. Updating type: ${customer_type}`);
+        // If they exist by name, UPDATE them with new metadata if provided
+        if (customer_type) existingByName.customer_type = customer_type;
+        if (employment_status !== undefined) existingByName.employment_status = employment_status;
+        if (payment_status) existingByName.payment_status = payment_status;
+
+        const updated = await existingByName.save();
+        return res.json(updated);
       }
     }
 
@@ -186,13 +309,25 @@ app.post('/api/customer', async (req, res) => {
       unique_id,
       name: name || undefined,
       email: email || undefined,
-      phone: phone || undefined
+      phone: phone || undefined,
+      customer_type,
+      employment_status,
+      payment_status
     });
 
     const savedCustomer = await customer.save();
+    await logActivity(req, 'Create Customer', `Added new customer: ${name} (${unique_id})`);
     res.json(savedCustomer);
   } catch (err) {
     if (err.code === 11000) {
+      // If ID collision, try to update that existing record too
+      const existing = await Customer.findOne({ unique_id: req.body.unique_id });
+      if (existing) {
+        if (req.body.customer_type) existing.customer_type = req.body.customer_type;
+        if (req.body.employment_status !== undefined) existing.employment_status = req.body.employment_status;
+        const updated = await existing.save();
+        return res.json(updated);
+      }
       return res.status(409).json({ error: 'Customer with this unique ID already exists' });
     }
     console.error('Error creating customer:', err);
@@ -270,6 +405,7 @@ app.post('/api/order', async (req, res) => {
     });
 
     const savedOrder = await order.save();
+    await logActivity(req, 'Add Order', `Added ${order_name} (₱${order_amount}) to ${customer.name}`);
 
     // Update customer balance and last transaction date using atomic operator
     // This prevents race conditions when multiple orders are placed simultaneously
@@ -336,6 +472,10 @@ app.post('/api/orders/batch', async (req, res) => {
     // Calculate total amount and update customer balance atomically
     const totalAmount = ordersToInsert.reduce((sum, o) => sum + o.order_amount, 0);
 
+    // Activity logging for batch
+    const orderNames = ordersToInsert.map(o => o.order_name).join(', ');
+    await logActivity(req, 'Add Batch Orders', `Added items: ${orderNames} (Total: ₱${totalAmount}) to ${customer.name}`);
+
     if (totalAmount > 0) {
       await Customer.findByIdAndUpdate(
         customer._id,
@@ -365,13 +505,16 @@ app.post('/api/orders/batch', async (req, res) => {
 // Update customer
 app.put('/api/customer/:id', requireRole('admin'), async (req, res) => {
   try {
-    const { name, email, phone, balance, is_active } = req.body;
+    const { name, email, phone, balance, is_active, customer_type, employment_status, payment_status } = req.body;
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email;
     if (phone !== undefined) updateData.phone = phone;
     if (balance !== undefined) updateData.balance = parseFloat(balance);
     if (is_active !== undefined) updateData.is_active = is_active;
+    if (customer_type !== undefined) updateData.customer_type = customer_type;
+    if (employment_status !== undefined) updateData.employment_status = employment_status;
+    if (payment_status !== undefined) updateData.payment_status = payment_status;
 
     const customer = await Customer.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
@@ -391,6 +534,7 @@ app.delete('/api/customer/:id', requireRole('admin'), async (req, res) => {
 
     await Order.deleteMany({ customer_id: customer._id });
     await Customer.findByIdAndDelete(req.params.id);
+    await logActivity(req, 'Delete Customer', `Admin deleted customer: ${customer.name} and all their orders`);
 
     res.json({ message: 'Customer and associated orders deleted' });
   } catch (err) {
@@ -428,6 +572,7 @@ app.post('/api/customer/:id/payment', requireRole('admin'), async (req, res) => 
       order_status: 'completed'
     });
     await paymentOrder.save();
+    await logActivity(req, 'Record Payment', `Recorded ₱${paymentAmount.toFixed(2)} payment for ${customer.name}`);
 
     res.json({
       success: true,
@@ -492,6 +637,45 @@ app.get('/api/export/orders', requireRole('admin'), async (req, res) => {
   }
 });
 
+app.get('/api/export/financial-report', requireRole('admin'), async (req, res) => {
+  try {
+    // Aggregate orders to find first and last borrow dates for each customer
+    const orderStats = await Order.aggregate([
+      { $match: { order_amount: { $gt: 0 } } },
+      {
+        $group: {
+          _id: "$customer_id",
+          first_borrow: { $min: "$createdAt" },
+          last_borrow: { $max: "$createdAt" }
+        }
+      }
+    ]);
+
+    // Create a map for quick lookup
+    const statsMap = {};
+    orderStats.forEach(stat => {
+      statsMap[stat._id.toString()] = {
+        first: stat.first_borrow,
+        last: stat.last_borrow
+      };
+    });
+
+    const customers = await Customer.find().sort({ name: 1 }).lean();
+
+    const reportData = customers.map(c => ({
+      name: c.name || 'Unknown',
+      balance: c.balance || 0,
+      first_borrow: statsMap[c._id.toString()]?.first || null,
+      last_borrow: statsMap[c._id.toString()]?.last || null
+    }));
+
+    res.json(reportData);
+  } catch (err) {
+    console.error('Financial report aggregation error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // --- Menu Management Endpoints ---
 
 // Get all menu items
@@ -551,13 +735,30 @@ app.get('/api/analytics', async (req, res) => {
     const highDebtCustomers = await Customer.find({ balance: { $gt: 0 } })
       .sort({ balance: -1 })
       .limit(5)
-      .select('name unique_id balance email');
+      .select('name unique_id balance email customer_type payment_status');
 
     // 2. Most Popular Products (All Time)
+    // Refactored to split consolidated orders and count individual items
     const activeProducts = await Order.aggregate([
-      { $group: { _id: "$order_name", count: { $sum: 1 }, totalRevenue: { $sum: "$order_amount" } } },
+      // Split "Soda (10), Cake (20)" into array ["Soda (10)", "Cake (20)"]
+      { $project: { items: { $split: ["$order_name", ", "] }, order_amount: 1 } },
+      { $unwind: "$items" },
+      // Split "Soda (10)" by " (" and take first part "Soda"
+      {
+        $project: {
+          itemName: { $arrayElemAt: [{ $split: ["$items", " ("] }, 0] },
+          order_amount: 1
+        }
+      },
+      {
+        $group: {
+          _id: "$itemName",
+          count: { $sum: 1 },
+          totalRevenue: { $sum: "$order_amount" }
+        }
+      },
       { $sort: { count: -1 } },
-      { $limit: 5 }
+      { $limit: 10 }
     ]);
 
     // 3. AI/Trend Insight: Trending Product (Last 7 Days)
@@ -566,7 +767,14 @@ app.get('/api/analytics', async (req, res) => {
 
     const trendingProducts = await Order.aggregate([
       { $match: { createdAt: { $gte: sevenDaysAgo } } },
-      { $group: { _id: "$order_name", count: { $sum: 1 } } },
+      { $project: { items: { $split: ["$order_name", ", "] } } },
+      { $unwind: "$items" },
+      {
+        $project: {
+          itemName: { $arrayElemAt: [{ $split: ["$items", " ("] }, 0] }
+        }
+      },
+      { $group: { _id: "$itemName", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 3 }
     ]);

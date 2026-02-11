@@ -25,6 +25,20 @@ const customerSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  customer_type: {
+    type: String,
+    enum: ['Regular', 'Non-Regular'],
+    default: 'Regular'
+  },
+  employment_status: {
+    type: String,
+    trim: true
+  },
+  payment_status: {
+    type: String,
+    enum: ['Paid', 'Not Paid', 'Partial'],
+    default: 'Not Paid'
+  },
   last_transaction_date: {
     type: Date
   },

@@ -193,10 +193,7 @@ const Login = ({ onLogin }) => {
                     </button>
                 </form>
 
-                <div className="login-footer">
-                    <p className="role-hint">👤 Admin — Full dashboard access</p>
-                    <p className="role-hint">📱 Staff — Mobile order capture</p>
-                </div>
+            
             </div>
         </div>
     );

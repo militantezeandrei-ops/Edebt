@@ -125,6 +125,10 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
         }
     };
 
+    const userRole = localStorage.getItem('userRole');
+    const username = localStorage.getItem('username');
+    const headers = { 'x-user-role': userRole, 'x-username': username };
+
     const startCamera = async () => {
         // if (!isSecureContext) {
         //     setError("Camera requires HTTPS or localhost.");
@@ -296,21 +300,31 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
             }
 
             setLoading(true);
-            // Direct API call to create order (Batch Mode optimization)
-            // We calculate the total amount here
-            const totalAmount = orderItem.items.reduce((sum, item) => {
-                return sum + (item.validatedPrice || parseFloat(item.originalPrice) || 0);
-            }, 0);
 
-            const orderPayload = {
+            // Consolidate all items from the slip into a single "Grouped Order"
+            // This matches the user's preference for a single row with total price
+            const consolidatedName = orderItem.items
+                .map(item => {
+                    const name = item.validatedName || item.originalName || 'Unknown';
+                    const price = item.validatedPrice || parseFloat(item.originalPrice) || 0;
+                    return `${name} (${price})`;
+                })
+                .join(', ');
+
+            const totalAmount = orderItem.items.reduce((sum, item) =>
+                sum + (item.validatedPrice || parseFloat(item.originalPrice) || 0), 0);
+
+            const singleOrderRequest = {
                 customer_unique_id: orderItem.validatedCustomer.unique_id,
-                order_name: `Scanned Order - ${new Date().toLocaleDateString()}`,
-                order_description: orderItem.items.map(i => `${i.validatedName || i.originalName} (${i.validatedPrice || i.originalPrice})`).join(', '),
+                order_name: consolidatedName,
+                order_description: '',
                 order_amount: totalAmount,
-                order_status: 'completed'
+                order_status: 'completed',
+                is_scanned: true
             };
 
-            await axios.post(`${API_URL}/api/order`, orderPayload);
+            // Use the batch endpoint for consistency (even for one grouped order)
+            await axios.post(`${API_URL}/api/orders/batch`, { orders: [singleOrderRequest] }, { headers });
 
             // Update local status to saved
             setDetectedOrders(prev => prev.map(o =>
@@ -442,10 +456,10 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
                             </div>
                             <p className="camera-hint">Position the order slip within the frame</p>
                             <div className="camera-actions">
-                                <button className="button button-circle btn-cancel" onClick={cancelCapture} aria-label="Cancel">
+                                <button className="capture-action-btn btn-cancel" onClick={cancelCapture} aria-label="Cancel">
                                     <span>✕</span>
                                 </button>
-                                <button className="button button-circle btn-capture" onClick={capturePhoto} aria-label="Capture">
+                                <button className="capture-action-btn btn-capture" onClick={capturePhoto} aria-label="Capture">
                                     <span>✓</span>
                                 </button>
                                 {/* Spacer or toggle flash in future? For now just 2 buttons centered by flex */}
@@ -556,11 +570,6 @@ const HandwrittenCapture = ({ onCaptureSuccess, onCustomerNotFound, newlyCreated
                                 </button>
                             </div>
 
-                            {/* Raw OCR Text (collapsible) */}
-                            <details className="raw-text-details">
-                                <summary>View Raw AI Response</summary>
-                                <pre className="raw-text">{rawText || 'No text extracted'}</pre>
-                            </details>
                         </div>
                     )}
                 </div>

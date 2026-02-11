@@ -27,6 +27,10 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'processing', 'completed', 'cancelled'],
     default: 'pending'
+  },
+  is_scanned: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true // This adds createdAt and updatedAt fields

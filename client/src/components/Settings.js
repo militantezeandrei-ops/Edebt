@@ -5,7 +5,7 @@ import API_URL from '../config/api';
 import './Settings.css';
 
 const Settings = ({ onBack, onLogout, darkMode, toggleDarkMode }) => {
-    const [shopName, setShopName] = useState(localStorage.getItem('shopName') || 'My Digital Store');
+    const [shopName, setShopName] = useState(localStorage.getItem('shopName') || 'Canteen');
     const [ownerName, setOwnerName] = useState(localStorage.getItem('ownerName') || 'Admin');
 
     // Toast Configuration

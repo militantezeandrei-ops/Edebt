@@ -124,3 +124,28 @@
         display: none;
     }
 }
+/* === Light Mode === */
+[data-theme=""light""] .status-chip:hover {
+    background: #f3f4f6;
+}
+
+[data-theme=""light""] .orders-table-wrapper {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+[data-theme=""light""] .orders-table th {
+    background: #f8fafc;
+    color: #374151;
+    border-bottom-color: #e5e7eb;
+}
+
+[data-theme=""light""] .orders-table td {
+    border-bottom-color: #f3f4f6;
+}
+
+[data-theme=""light""] .status-select {
+    background: #ffffff;
+    border-color: #d1d5db;
+    color: #1f2937;
+}

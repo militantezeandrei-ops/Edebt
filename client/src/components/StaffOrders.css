@@ -103,3 +103,31 @@
 .soc-process-btn:hover {
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
+/* === Light Mode === */
+[data-theme=""light""] .staff-filter-btn {
+    border-color: #d1d5db;
+    color: #6b7280;
+}
+
+[data-theme=""light""] .staff-filter-btn.active {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    border-color: #6366f1;
+}
+
+[data-theme=""light""] .staff-order-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+[data-theme=""light""] .soc-desc {
+    color: #6b7280;
+}
+
+[data-theme=""light""] .soc-meta {
+    color: #9ca3af;
+}
+
+[data-theme=""light""] .soc-date {
+    color: #9ca3af;
+}

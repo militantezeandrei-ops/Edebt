@@ -5,6 +5,19 @@
     padding: 1rem;
 }
 
+@media (max-width: 480px) {
+    .handwritten-capture-container {
+        padding: 0;
+        max-width: 100%;
+    }
+
+    .capture-card {
+        border-radius: 0;
+        padding: 1rem 0;
+        /* Maintain vertical padding but remove horizontal */
+    }
+}
+
 .capture-card {
     background: var(--bg-card);
     border-radius: 16px;
@@ -88,8 +101,9 @@
 
 .capture-instruction {
     margin-top: 0.5rem;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    font-weight: 500;
     text-align: center;
 }
 
@@ -168,69 +182,51 @@
 
 .camera-hint {
     margin: 1rem 0;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 
+/* Action Buttons Bar at bottom of camera view */
 .camera-actions {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 1rem 0;
+    padding: 1.5rem 0;
+    z-index: 3;
 }
 
-/* Cancel Button - Red */
-.camera-actions .button-ghost {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
+.capture-action-btn {
+    width: 72px;
+    height: 72px;
+    flex: none;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
     border: none;
-    padding: 0.875rem 1.5rem;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
-    min-width: 120px;
-}
-
-.camera-actions .button-ghost:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-}
-
-.camera-actions .button-ghost:active {
-    transform: scale(0.98);
-}
-
-/* Capture Button - Purple */
-.button-capture {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    color: white;
-    border: none;
-    padding: 0.875rem 1.5rem;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    min-width: 120px;
     justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-.button-capture:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+.capture-action-btn:active {
+    transform: scale(0.9);
 }
 
-.button-capture:active {
-    transform: scale(0.98);
+.capture-action-btn.btn-cancel {
+    background: #ef4444;
+    color: white;
+}
+
+.capture-action-btn.btn-capture {
+    background: #10b981;
+    color: white;
+    font-size: 1.8rem;
 }
 
 .capture-icon {
@@ -424,12 +420,12 @@
     display: flex;
     justify-content: space-between;
     padding: 2px 0;
-    color: var(--text-secondary);
+    color: #ffffff;
 }
 
 .mini-items-list li.empty {
     font-style: italic;
-    color: var(--text-light);
+    color: #94a3b8;
 }
 
 .card-actions {
@@ -565,32 +561,6 @@
 }
 
 
-/* Raw Text Details */
-.raw-text-details {
-    text-align: left;
-    margin-top: 1rem;
-    border-top: 1px solid var(--border-color);
-    padding-top: 1rem;
-}
-
-.raw-text-details summary {
-    cursor: pointer;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
-
-.raw-text {
-    background: #1e293b;
-    color: #e2e8f0;
-    padding: 0.75rem;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    max-height: 200px;
-    overflow-y: auto;
-}
 
 /* Loading Overlay */
 .loading-overlay {
@@ -867,4 +837,80 @@
         background: #0f172a;
         border-top: 1px solid #1e293b;
     }
+}
+/* === Light Mode Overrides for HandwrittenCapture === */
+[data-theme=""light""] .capture-card {
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme=""light""] .capture-instruction {
+    color: #4b5563;
+}
+
+[data-theme=""light""] .camera-hint {
+    color: #4b5563;
+}
+
+[data-theme=""light""] .order-total-row {
+    color: #1f2937;
+    border-top-color: #e5e7eb;
+}
+
+[data-theme=""light""] .order-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+    border-bottom-color: #3b82f6;
+}
+
+[data-theme=""light""] .order-card.saved {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: #10b981;
+}
+
+[data-theme=""light""] .customer-name {
+    color: #1f2937;
+}
+
+[data-theme=""light""] .mini-items-list li {
+    color: #4b5563;
+}
+
+[data-theme=""light""] .mini-items-list li.empty {
+    color: #9ca3af;
+}
+
+[data-theme=""light""] .btn-edit {
+    background: #ffffff;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+[data-theme=""light""] .btn-edit:hover {
+    background: #f9fafb;
+}
+
+[data-theme=""light""] .item-name-input,
+[data-theme=""light""] .item-price-input {
+    background: #ffffff;
+    color: #1f2937;
+    border-color: #d1d5db;
+}
+
+[data-theme=""light""] .item-name-input::placeholder,
+[data-theme=""light""] .item-price-input::placeholder {
+    color: #9ca3af;
+}
+
+[data-theme=""light""] .results-header h3 {
+    color: #1f2937;
+}
+
+[data-theme=""light""] .results-bottom-actions {
+    border-top-color: #e5e7eb;
+}
+
+[data-theme=""light""] .camera-actions {
+    background: #ffffff;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
 }

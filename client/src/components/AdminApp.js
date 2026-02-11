@@ -3,6 +3,7 @@ import AnalyticsDashboard from './AnalyticsDashboard';
 import AdminCustomers from './AdminCustomers';
 import AdminPayments from './AdminPayments';
 import AdminExport from './AdminExport';
+import AdminUsers from './AdminUsers';
 import Settings from './Settings';
 import './AdminApp.css';
 
@@ -10,30 +11,30 @@ const AdminApp = ({ onLogout, darkMode, toggleDarkMode }) => {
     const [activeSection, setActiveSection] = useState('dashboard');
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-    const username = localStorage.getItem('username') || 'Admin';
+    const username = localStorage.getItem('username') || 'Alex Rivera';
 
     const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+        { id: 'dashboard', label: 'Dashboard', icon: '🎛️' },
         { id: 'customers', label: 'Customers', icon: '👥' },
-        { id: 'payments', label: 'Payments', icon: '💰' },
-        { id: 'export', label: 'Export Data', icon: '📤' },
+        { id: 'users', label: 'Staff/Users', icon: '👤' },
+        { id: 'export', label: 'Reports', icon: '📊' },
         { id: 'settings', label: 'Settings', icon: '⚙️' },
     ];
 
     const renderContent = () => {
         switch (activeSection) {
             case 'dashboard':
-                return <AnalyticsDashboard onBack={() => { }} />;
+                return <AnalyticsDashboard onBack={() => { }} setActiveSection={setActiveSection} />;
             case 'customers':
                 return <AdminCustomers />;
-            case 'payments':
-                return <AdminPayments />;
+            case 'users':
+                return <AdminUsers />;
             case 'export':
                 return <AdminExport />;
             case 'settings':
                 return <Settings onBack={() => setActiveSection('dashboard')} onLogout={onLogout} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />;
             default:
-                return <AnalyticsDashboard onBack={() => { }} />;
+                return <AnalyticsDashboard onBack={() => { }} setActiveSection={setActiveSection} />;
         }
     };
 
@@ -43,16 +44,9 @@ const AdminApp = ({ onLogout, darkMode, toggleDarkMode }) => {
             <aside className="admin-sidebar">
                 <div className="sidebar-header">
                     <div className="sidebar-brand">
-                        <span className="brand-icon">💼</span>
-                        {!sidebarCollapsed && <span className="brand-text">E-Debt Admin</span>}
+                        <div className="brand-icon-wrapper">E</div>
+                        {!sidebarCollapsed && <span className="brand-text">E-Debt <span>Admin</span></span>}
                     </div>
-                    <button
-                        className="sidebar-toggle"
-                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        title={sidebarCollapsed ? 'Expand' : 'Collapse'}
-                    >
-                        {sidebarCollapsed ? '▶' : '◀'}
-                    </button>
                 </div>
 
                 <nav className="sidebar-nav">
@@ -70,18 +64,20 @@ const AdminApp = ({ onLogout, darkMode, toggleDarkMode }) => {
                 </nav>
 
                 <div className="sidebar-footer">
-                    <div className="user-info">
-                        <div className="user-avatar">{username.charAt(0).toUpperCase()}</div>
+                    <div className="user-profile-mini">
+                        <div className="profile-avatar">
+                            {/* Simple colored avatar like in image */}
+                        </div>
                         {!sidebarCollapsed && (
-                            <div className="user-details">
-                                <span className="user-name">{username}</span>
-                                <span className="user-role">Administrator</span>
+                            <div className="profile-info">
+                                <span className="profile-name">{username}</span>
+                                <span className="profile-role">Administrator</span>
                             </div>
                         )}
                     </div>
-                    <button className="sidebar-logout" onClick={onLogout} title="Logout">
-                        <span className="sidebar-icon">🚪</span>
-                        {!sidebarCollapsed && <span className="sidebar-label">Logout</span>}
+                    <button className="sidebar-logout" onClick={onLogout}>
+                        <span className="logout-icon">↩️</span>
+                        {!sidebarCollapsed && <span>Logout</span>}
                     </button>
                 </div>
             </aside>
@@ -89,12 +85,15 @@ const AdminApp = ({ onLogout, darkMode, toggleDarkMode }) => {
             {/* Main Content */}
             <main className="admin-main">
                 <header className="admin-topbar">
-                    <h1 className="page-title">
-                        {menuItems.find(i => i.id === activeSection)?.icon}{' '}
-                        {menuItems.find(i => i.id === activeSection)?.label}
-                    </h1>
-                    <div className="topbar-actions">
-                        <button className="theme-toggle" onClick={toggleDarkMode} title="Toggle theme">
+                    <div className="topbar-search">
+                        <input type="text" placeholder="Search transactions, customers..." />
+                    </div>
+                    <div className="topbar-right">
+                        <button className="icon-btn" title="Notifications">
+                            🔔
+                            <span className="notification-dot"></span>
+                        </button>
+                        <button className="icon-btn" onClick={toggleDarkMode} title="Toggle Theme">
                             {darkMode ? '☀️' : '🌙'}
                         </button>
                     </div>

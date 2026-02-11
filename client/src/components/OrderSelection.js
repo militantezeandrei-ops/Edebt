@@ -33,7 +33,7 @@ const OrderSelection = ({ customerId, initialCustomer, onOrderSaved, onBack }) =
         tempId: Date.now() + index,
         name: item.validatedName || item.originalName,
         price: item.validatedPrice || 0,
-        description: 'From handwritten capture'
+        description: ''
       }));
       setCart(prefilledCart);
     }
@@ -91,13 +91,31 @@ const OrderSelection = ({ customerId, initialCustomer, onOrderSaved, onBack }) =
     setLoading(true);
 
     const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
-    const orderRequests = cart.map(item => ({
-      customer_unique_id: customerId,
-      order_name: item.name,
-      order_description: item.description,
-      order_amount: item.price,
-      order_status: 'pending'
-    }));
+    const isFromScan = !!(initialCustomer?.capturedItems?.length > 0);
+
+    let orderRequests = [];
+
+    if (isFromScan) {
+      // Consolidate into one row for scanned slips
+      orderRequests = [{
+        customer_unique_id: customerId,
+        order_name: cart.map(item => `${item.name} (${item.price})`).join(', '),
+        order_description: '', // Keep clean / no extra meta
+        order_amount: totalAmount,
+        order_status: 'pending',
+        is_scanned: true
+      }];
+    } else {
+      // Standard individual items for manual selection
+      orderRequests = cart.map(item => ({
+        customer_unique_id: customerId,
+        order_name: item.name,
+        order_description: item.description,
+        order_amount: item.price,
+        order_status: 'pending',
+        is_scanned: false
+      }));
+    }
 
     // 1. OPTIMISTIC UPDATE - Update local customer balance immediately
     await OfflineStorage.updateCustomerBalance(customerId, totalAmount);
@@ -107,7 +125,11 @@ const OrderSelection = ({ customerId, initialCustomer, onOrderSaved, onBack }) =
     if (navigator.onLine) {
       try {
         // Use batch endpoint instead of individual requests
-        await axios.post(`${API_URL}/api/orders/batch`, { orders: orderRequests });
+        const userHeaders = {
+          'x-user-role': localStorage.getItem('userRole'),
+          'x-username': localStorage.getItem('username')
+        };
+        await axios.post(`${API_URL}/api/orders/batch`, { orders: orderRequests }, { headers: userHeaders });
         synced = true;
         console.log('[OrderSelection] Orders synced to server successfully (batch)');
       } catch (e) {
@@ -137,7 +159,7 @@ const OrderSelection = ({ customerId, initialCustomer, onOrderSaved, onBack }) =
       title: synced ? 'Order Confirmed!' : 'Order Saved Offline',
       html: `
         <div style="text-align: center;">
-          <p style="font-size: 1.2rem; font-weight: 600;">Total: ₱${totalAmount.toFixed(2)}</p>
+          <p style="font-size: 1.2rem; font-weight: 600;">Total: P ${totalAmount.toFixed(2)}</p>
           <p style="color: #6b7280; font-size: 0.9rem;">${cart.length} item(s)</p>
           <p style="margin-top: 8px; color: ${synced ? '#10b981' : '#f59e0b'};">
             ${synced ? '✓ Synced with server' : '⏳ Will sync when online'}
@@ -178,7 +200,7 @@ const OrderSelection = ({ customerId, initialCustomer, onOrderSaved, onBack }) =
           <div className="customer-info-header">
             <span className="customer-name">{customerInfo.name || customerInfo.unique_id}</span>
             <span className={`customer-balance ${customerInfo.balance > 0 ? 'debt' : 'credit'}`}>
-              Balance: ₱{(customerInfo.balance || 0).toFixed(2)}
+              Balance: P ${(customerInfo.balance || 0).toFixed(2)}
             </span>
           </div>
         )}
@@ -207,7 +229,7 @@ const OrderSelection = ({ customerId, initialCustomer, onOrderSaved, onBack }) =
                 <div key={item.tempId} className="cart-item">
                   <div className="cart-item-info">
                     <span className="cart-item-name">{item.name}</span>
-                    <span className="cart-item-price">₱{item.price.toFixed(2)}</span>
+                    <span className="cart-item-price">P {item.price.toFixed(2)}</span>
                   </div>
                   <button
                     className="remove-btn"
@@ -230,7 +252,7 @@ const OrderSelection = ({ customerId, initialCustomer, onOrderSaved, onBack }) =
               </div>
               <div className="summary-row total">
                 <span>Total:</span>
-                <span>₱{cartTotal.toFixed(2)}</span>
+                <span>P ${cartTotal.toFixed(2)}</span>
               </div>
             </div>
 

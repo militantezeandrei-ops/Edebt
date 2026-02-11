@@ -2,11 +2,9 @@ import React, { useState, useCallback } from 'react';
 import HandwrittenCapture from './HandwrittenCapture';
 import OrderSelection from './OrderSelection';
 import CreateCustomer from './CreateCustomer';
-import ConnectionTest from './ConnectionTest';
 import StaffCustomers from './StaffCustomers';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import SyncManager from './SyncManager';
-import OfflineIndicator from './OfflineIndicator';
 import './StaffApp.css';
 
 const StaffApp = ({ onLogout, darkMode, toggleDarkMode }) => {
@@ -148,7 +146,6 @@ const StaffApp = ({ onLogout, darkMode, toggleDarkMode }) => {
                 )}
 
                 <div style={{ display: showOrderSelection || showCreateCustomer ? 'none' : 'block' }}>
-                    <ConnectionTest />
                     <HandwrittenCapture
                         key={captureKey}
                         onCaptureSuccess={handleScanSuccess}
@@ -164,10 +161,13 @@ const StaffApp = ({ onLogout, darkMode, toggleDarkMode }) => {
     return (
         <div className="staff-layout">
             <SyncManager onSyncComplete={() => console.log('[StaffApp] Sync complete')} />
-            <OfflineIndicator onSyncClick={() => window.triggerSync && window.triggerSync()} />
 
             <header className="staff-header">
                 <span className="staff-greeting">📱 Hi, {username}</span>
+                <div className="system-health-badge">
+                    <span className="health-dot active"></span>
+                    <span className="health-text">System Online</span>
+                </div>
                 <span className="staff-role-badge">Staff</span>
             </header>
 
@@ -199,7 +199,7 @@ const StaffApp = ({ onLogout, darkMode, toggleDarkMode }) => {
                     onClick={() => setActiveTab('analytics')}
                 >
                     <span className="nav-icon">📊</span>
-                    <span className="nav-label">Analytics</span>
+                    <span className="nav-label">Reports</span>
                 </button>
 
                 <button

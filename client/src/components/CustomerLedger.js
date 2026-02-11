@@ -205,7 +205,7 @@ const CustomerLedger = ({ onBack }) => {
                                             <span className="user-id">ID: {customer.unique_id}</span>
                                         </div>
                                         <div className={`user-balance ${riskClass}`}>
-                                            ₱{(customer.balance || 0).toFixed(2)}
+                                            P {(customer.balance || 0).toFixed(2)}
                                         </div>
                                         <div className="expand-icon">
                                             {isExpanded ? '▲' : '▼'}
@@ -232,7 +232,7 @@ const CustomerLedger = ({ onBack }) => {
                                                                     <span>{order.order_name}</span>
                                                                 )}
                                                             </div>
-                                                            <div className="h-amount">₱{order.order_amount.toFixed(2)}</div>
+                                                            <div className="h-amount">P {order.order_amount.toFixed(2)}</div>
                                                         </li>
                                                     ))}
                                                     {/* Opening Balance Calculation */}
@@ -244,7 +244,7 @@ const CustomerLedger = ({ onBack }) => {
                                                                 <li className="history-item opening-balance-row">
                                                                     <div className="h-date">--/--</div>
                                                                     <div className="h-items"><em>Opening Balance / Adjustment</em></div>
-                                                                    <div className="h-amount">₱{openingBal.toFixed(2)}</div>
+                                                                    <div className="h-amount">P {openingBal.toFixed(2)}</div>
                                                                 </li>
                                                             );
                                                         }

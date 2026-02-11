@@ -88,7 +88,7 @@ const StaffOrders = () => {
                             )}
                             <div className="soc-meta">
                                 <span>👤 {order.customer_name || order.customer_unique_id}</span>
-                                <span>₱{Math.abs(order.order_amount || 0).toFixed(2)}</span>
+                                <span>P {Math.abs(order.order_amount || 0).toFixed(2)}</span>
                             </div>
                             <div className="soc-footer">
                                 <span className="soc-date">

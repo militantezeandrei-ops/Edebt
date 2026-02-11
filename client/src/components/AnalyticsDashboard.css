@@ -1,352 +1,503 @@
-/* Base Layout */
+/* Dashbord Specific Styles */
 .analytics-dashboard {
-    padding: 10px;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 20px 0;
 }
 
-.dashboard-header h2 {
-    font-size: 1.5rem;
-    color: #1f2937;
-    margin-bottom: 20px;
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+}
+
+.header-title-group h2 {
+    font-size: 32px;
     font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 4px;
+}
+
+.last-updated {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.filter-btn,
+.export-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn {
+    background: var(--input-bg);
+    border: 1px solid var(--border-soft);
+    color: var(--text-main);
+}
+
+.export-btn {
+    background: var(--accent-purple);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 15px var(--accent-purple-glow);
+}
+
+/* Metric Row */
+.metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.m-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.m-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.m-icon-box {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.metric-card.revenue .m-icon-box {
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.metric-card.orders .m-icon-box {
+    color: var(--accent-purple);
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.metric-card.customers .m-icon-box {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.metric-card.debt .m-icon-box {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.m-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: white;
+}
+
+.m-footer {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.m-bar-bg {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.m-bar {
+    height: 100%;
+}
+
+.metric-card.revenue .m-bar {
+    background: var(--success);
+    width: 45%;
+}
+
+.metric-card.orders .m-bar {
+    background: var(--accent-purple);
+    width: 30%;
 }
 
 /* Bento Grid */
 .bento-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    grid-template-areas:
-        "metric1 metric2"
-        "insight insight"
-        "products products"
-        "debt debt";
+    grid-template-columns: 350px 1fr;
+    gap: 20px;
+    align-items: start;
 }
 
-@media (min-width: 768px) {
-    .bento-grid {
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-template-areas:
-            "metric1 metric2 products"
-            "insight insight products"
-            "debt debt debt";
-    }
-}
-
-/* Cards */
-.bento-card {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f3f4f6;
+.bento-left {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    gap: 20px;
 }
 
-.metric-card {
-    position: relative;
-    min-height: 140px;
+.bento-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.metric-card:nth-child(1) {
-    grid-area: metric1;
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    padding: 24px;
 }
 
-.metric-card:nth-child(2) {
-    grid-area: metric2;
-}
-
-.ai-insight-card {
-    grid-area: insight;
-}
-
-.products-card {
-    grid-area: products;
-}
-
-.card-header h3 {
-    margin: 0 0 15px 0;
-    color: #1f2937;
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
-.debt-card {
-    grid-area: debt;
-}
-
-/* Metric Styling */
-.metric-header {
+.card-title-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 24px;
 }
 
-.metric-title {
-    color: #6b7280;
-    font-size: 0.85rem;
+.card-title-row h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.view-all-link {
+    font-size: 12px;
+    color: var(--accent-purple);
+    text-decoration: none;
     font-weight: 600;
 }
 
-.metric-icon {
-    font-size: 1.2rem;
-    background: #f9fafb;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-}
-
-.metric-value {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #111827;
-    margin-bottom: 10px;
-}
-
-.mini-chart {
-    flex-grow: 1;
-    margin-bottom: -10px;
-    /* pull chart to edge */
-}
-
-/* AI Insights */
-.ai-insight-card {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    color: white;
-}
-
-.ai-insight-card .card-header h3 {
-    margin: 0 0 15px 0;
-    color: white;
-    font-size: 1.1rem;
-    opacity: 0.9;
-}
-
-.insight-content {
-    display: flex;
-    flex-direction: column;
-    /* Mobile first stack */
-    gap: 15px;
-}
-
-@media (min-width: 500px) {
-    .insight-content {
-        flex-direction: row;
-        justify-content: space-between;
-    }
-}
-
-.insight-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 12px;
-    border-radius: 12px;
-    flex: 1;
-}
-
-.icon-badge {
-    font-size: 1.5rem;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-}
-
-.label {
-    font-size: 0.75rem;
-    opacity: 0.8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: block;
-}
-
-.value {
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
-.value.negative {
-    color: #fca5a5;
-}
-
-/* Product List */
-.product-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
+/* Products List */
 .product-item {
-    position: relative;
-    padding-bottom: 8px;
-    border-bottom: 1px dashed #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
 }
 
-.p-rank {
-    position: absolute;
-    left: 0;
-    top: 2px;
-    font-size: 0.7rem;
-    color: #9ca3af;
-    font-weight: bold;
-}
-
-.p-info {
+.p-info-row {
     display: flex;
     justify-content: space-between;
-    margin-left: 15px;
-    margin-bottom: 4px;
-    font-size: 0.9rem;
+    font-size: 14px;
 }
 
 .p-name {
     font-weight: 600;
-    color: #374151;
+    color: var(--text-main);
 }
 
 .p-count {
-    color: #6b7280;
-    font-size: 0.8rem;
+    color: var(--text-muted);
 }
 
 .p-bar-bg {
     height: 6px;
-    background: #f3f4f6;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 3px;
-    margin-left: 15px;
     overflow: hidden;
 }
 
 .p-bar {
     height: 100%;
-    background: #3b82f6;
-    border-radius: 3px;
+    background: var(--accent-purple);
 }
 
-/* Debt List */
-.debt-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+/* AI Insight */
+.ai-insight-card {
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.1);
 }
 
-.debt-item {
+.ai-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    background: #fef2f2;
-    border-radius: 12px;
-    border: 1px solid #fee2e2;
+    gap: 8px;
+    color: #fbbf24;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 16px;
 }
 
-.d-avatar {
-    width: 36px;
-    height: 36px;
-    background: #ef4444;
-    color: white;
+.ai-content {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.ai-content span {
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+/* Activity List */
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.a-icon {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    margin-right: 12px;
+    font-size: 14px;
+    flex-shrink: 0;
 }
 
-.d-info {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
+.a-icon.payment {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
 }
 
-.d-name {
+.a-icon.orders {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--accent-purple);
+}
+
+.a-details {
+    flex: 1;
+}
+
+.a-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 2px;
+}
+
+.a-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.a-desc span {
+    color: var(--text-main);
     font-weight: 600;
-    color: #1f2937;
-    font-size: 0.95rem;
 }
 
-.d-id {
-    font-size: 0.75rem;
-    color: #6b7280;
+.a-time {
+    font-size: 11px;
+    color: var(--text-muted);
 }
 
-.d-amount {
-    color: #dc2626;
+/* Outstanding Balances Table */
+.balances-table {
+    width: 100%;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 40px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 40px;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.c-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.c-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
     font-weight: 800;
-    font-size: 1rem;
 }
 
-/* === Dark Mode Styles === */
-[data-theme="dark"] .dashboard-header h2 {
-    color: #f1f5f9;
+.c-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
 }
 
-[data-theme="dark"] .bento-card {
-    background: #1e293b;
-    border-color: #334155;
+.c-type {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border-radius: 6px;
+    width: fit-content;
 }
 
-[data-theme="dark"] .metric-title {
-    color: #94a3b8;
+.c-balance {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--error);
 }
 
-[data-theme="dark"] .metric-value {
-    color: #f1f5f9;
+.row-action {
+    color: var(--text-muted);
+    font-size: 18px;
+    text-align: right;
+    cursor: pointer;
 }
 
-[data-theme="dark"] .metric-icon {
-    background: #334155;
+.balances-footer {
+    margin-top: 20px;
+    text-align: center;
 }
 
-[data-theme="dark"] .p-name {
-    color: #f1f5f9;
+.view-all-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
 }
 
-[data-theme="dark"] .p-count {
-    color: #94a3b8;
+.view-all-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
 }
 
-[data-theme="dark"] .p-rank {
-    color: #64748b;
+/* Staff View Compact Modes */
+.analytics-dashboard.staff-view {
+    padding: 10px 0;
 }
 
-[data-theme="dark"] .p-bar-bg {
-    background: #334155;
+.analytics-dashboard.staff-view .dashboard-header {
+    margin-bottom: 20px;
 }
 
-[data-theme="dark"] .product-item {
-    border-color: #334155;
+.analytics-dashboard.staff-view .header-title-group h2 {
+    font-size: 24px;
 }
 
-[data-theme="dark"] .debt-item {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.2);
+.analytics-dashboard.staff-view .metrics-row {
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-[data-theme="dark"] .d-name {
-    color: #f1f5f9;
+.analytics-dashboard.staff-view .metric-card {
+    padding: 16px;
+    gap: 8px;
 }
 
-[data-theme="dark"] .d-id {
-    color: #94a3b8;
+.analytics-dashboard.staff-view .m-value {
+    font-size: 20px;
 }
 
-[data-theme="dark"] .d-amount {
-    color: #f87171;
+.analytics-dashboard.staff-view .card {
+    padding: 16px;
 }
 
-[data-theme="dark"] .card-header h3 {
-    color: #f1f5f9;
+.analytics-dashboard.staff-view .card-title-row {
+    margin-bottom: 16px;
+}
+
+/* Specific Mobile Overrides for Staff */
+@media (max-width: 768px) {
+    .analytics-dashboard.staff-view .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .analytics-dashboard.staff-view .m-title {
+        font-size: 9px;
+    }
+
+    .analytics-dashboard.staff-view .m-icon-box {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .analytics-dashboard.staff-view .bento-grid {
+        gap: 12px;
+    }
+
+    .analytics-dashboard.staff-view .card {
+        padding: 12px;
+    }
+
+    .analytics-dashboard.staff-view .card-title-row h3 {
+        font-size: 16px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .metrics-row {
+        grid-template-columns: 1fr;
+    }
 }

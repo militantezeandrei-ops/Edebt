@@ -26,3 +26,19 @@
   color: #212529;
   flex: 1;
 }
+
+/* === Light Mode Overrides for CustomerInfo === */
+[data-theme=""light""] .detail-row {
+    background: #ffffff;
+    border-color: #6366f1;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #6366f1;
+}
+
+[data-theme=""light""] .detail-label {
+    color: #6b7280;
+}
+
+[data-theme=""light""] .detail-value {
+    color: #1f2937;
+}

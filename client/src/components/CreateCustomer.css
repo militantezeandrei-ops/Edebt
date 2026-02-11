@@ -21,14 +21,15 @@
 }
 
 .create-customer-message {
-  color: #495057;
+  color: #1a1a1a;
   margin-bottom: 20px;
   line-height: 1.6;
+  font-weight: 500;
 }
 
 .create-customer-message strong {
-  color: #667eea;
-  font-weight: 600;
+  color: #4f46e5;
+  font-weight: 700;
 }
 
 .create-customer-form {
@@ -53,19 +54,36 @@
   font-size: 0.95rem;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
   width: 100%;
-  padding: 10px;
-  border: 2px solid #dee2e6;
-  border-radius: 6px;
+  padding: 12px;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
   font-family: inherit;
+  background: #ffffff;
+  color: #000000 !important;
+  font-weight: 600;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #4f46e5;
+  background: #f8fafc;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
 }
 
 .form-group input:disabled {

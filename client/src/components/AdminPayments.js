@@ -51,7 +51,12 @@ const AdminPayments = () => {
             await axios.post(`${API_URL}/api/customer/${selectedCustomer._id}/payment`, {
                 amount: paymentAmount,
                 note: paymentNote
-            }, { headers: { 'x-user-role': userRole } });
+            }, {
+                headers: {
+                    'x-user-role': userRole,
+                    'x-username': localStorage.getItem('username')
+                }
+            });
 
             Swal.fire({ icon: 'success', title: 'Payment Recorded!', timer: 1500, showConfirmButton: false });
             setPaymentAmount('');
@@ -123,7 +128,7 @@ const AdminPayments = () => {
                         onChange={(e) => setPaymentAmount(e.target.value)} placeholder="0.00" />
                     {selectedCustomer && paymentAmount && (
                         <div className="payment-preview">
-                            New balance: ₱{Math.max(0, (selectedCustomer.balance || 0) - parseFloat(paymentAmount || 0)).toFixed(2)}
+                            New balance: P {Math.max(0, (selectedCustomer.balance || 0) - parseFloat(paymentAmount || 0)).toFixed(2)}
                         </div>
                     )}
                 </div>
@@ -149,7 +154,7 @@ const AdminPayments = () => {
                         <span className="ds-label">Debtors</span>
                     </div>
                     <div className="ds-card">
-                        <span className="ds-value">₱{debtors.reduce((s, c) => s + c.balance, 0).toFixed(2)}</span>
+                        <span className="ds-value">P {debtors.reduce((s, c) => s + c.balance, 0).toFixed(2)}</span>
                         <span className="ds-label">Total Outstanding</span>
                     </div>
                 </div>
@@ -168,7 +173,7 @@ const AdminPayments = () => {
                                         : 'No activity'}
                                 </span>
                             </div>
-                            <span className="di-amount">₱{c.balance.toFixed(2)}</span>
+                            <span className="di-amount">P {c.balance.toFixed(2)}</span>
                         </div>
                     ))}
                 </div>

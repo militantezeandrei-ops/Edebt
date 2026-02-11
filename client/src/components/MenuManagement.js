@@ -366,7 +366,7 @@ const MenuManagement = ({ onBack }) => {
                                     <div className="menu-info">
                                         <h4>{item.name}</h4>
                                         <div className="menu-meta">
-                                            <span className="price">₱{item.price.toFixed(2)}</span>
+                                            <span className="price">P {item.price.toFixed(2)}</span>
                                         </div>
                                     </div>
 

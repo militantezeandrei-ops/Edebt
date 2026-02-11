@@ -17,6 +17,8 @@ const CreateCustomer = ({ scannedId, onCustomerCreated, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [customerType, setCustomerType] = useState('Regular');
+  const [employmentStatus, setEmploymentStatus] = useState('Regular');
 
   React.useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -39,7 +41,10 @@ const CreateCustomer = ({ scannedId, onCustomerCreated, onCancel }) => {
     const customerData = {
       unique_id: generatedId,
       name: name.trim() || null,
-      balance: 0
+      balance: 0,
+      customer_type: (employmentStatus || 'Regular').trim(),
+      employment_status: (employmentStatus || 'Regular').trim(),
+      payment_status: 'Not Paid'
     };
 
     // Check if online - try server first
@@ -127,26 +132,28 @@ const CreateCustomer = ({ scannedId, onCustomerCreated, onCancel }) => {
 
         <form onSubmit={handleSubmit} className="create-customer-form">
           <div className="form-group">
-            <label htmlFor="uniqueId">Auto-Generated ID</label>
-            <input
-              type="text"
-              id="uniqueId"
-              value={generatedId}
-              disabled
-              className="disabled-input"
-            />
-            <small className="field-hint">System generated unique ID</small>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name">Full Name</label>
             <input
               type="text"
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter customer name"
+              required
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="employmentStatus">Employment Status</label>
+            <select
+              id="employmentStatus"
+              value={employmentStatus}
+              onChange={(e) => setEmploymentStatus(e.target.value)}
+              required
+            >
+              <option value="Regular">Regular</option>
+              <option value="Non-Regular">Non-Regular</option>
+            </select>
           </div>
 
           <div className="button-group">

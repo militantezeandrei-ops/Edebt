@@ -45,13 +45,13 @@ const WeeklyReport = ({ onBack }) => {
                                 <tr key={day._id}>
                                     <td>{day._id}</td>
                                     <td>{day.totalOrders}</td>
-                                    <td>${day.totalRevenue.toFixed(2)}</td>
+                                    <td>P {day.totalRevenue.toFixed(2)}</td>
                                 </tr>
                             ))}
                             <tr className="total-row">
                                 <td><strong>Total</strong></td>
                                 <td><strong>{reportData.reduce((sum, day) => sum + day.totalOrders, 0)}</strong></td>
-                                <td><strong>${reportData.reduce((sum, day) => sum + day.totalRevenue, 0).toFixed(2)}</strong></td>
+                                <td><strong>P {reportData.reduce((sum, day) => sum + day.totalRevenue, 0).toFixed(2)}</strong></td>
                             </tr>
                         </tbody>
                     </table>

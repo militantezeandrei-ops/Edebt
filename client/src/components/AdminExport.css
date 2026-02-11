@@ -99,7 +99,36 @@
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+.export-grid.single-card {
+    display: flex;
+    justify-content: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.export-grid.single-card .export-card {
+    width: 100%;
+}
+
 .btn-export:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+/* === Light Mode === */
+[data-theme=""light""] .export-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+[data-theme=""light""] .export-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme=""light""] .export-card p {
+    color: #6b7280;
+}
+
+[data-theme=""light""] .export-loading {
+    background: rgba(99, 102, 241, 0.05);
+    color: #6366f1;
 }

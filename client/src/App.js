@@ -46,7 +46,7 @@ function App() {
       document.body.setAttribute('data-theme', 'dark');
       localStorage.setItem('darkMode', 'true');
     } else {
-      document.body.removeAttribute('data-theme');
+      document.body.setAttribute('data-theme', 'light');
       localStorage.setItem('darkMode', 'false');
     }
   }, [darkMode]);
