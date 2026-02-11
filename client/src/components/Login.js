@@ -48,19 +48,23 @@ const Login = ({ onLogin }) => {
     useEffect(() => {
         const checkServer = async () => {
             try {
-                const res = await axios.get(`${API_URL}/api/health`, { timeout: 5000 });
+                // Increased timeout to 30s to handle Render cold starts
+                const res = await axios.get(`${API_URL}/api/health?t=${Date.now()}`, {
+                    timeout: 30000
+                });
                 if (res.data.status === 'OK') {
                     setServerStatus('online');
                 } else {
                     setServerStatus('offline');
                 }
             } catch (err) {
+                console.warn('Health check failed:', err.message);
                 setServerStatus('offline');
             }
         };
 
         checkServer();
-        const interval = setInterval(checkServer, 10000); // Check every 10s
+        const interval = setInterval(checkServer, 15000); // Check every 15s
         return () => clearInterval(interval);
     }, []);
 
@@ -152,6 +156,7 @@ const Login = ({ onLogin }) => {
                                 serverStatus === 'online' ? 'System Online' : 'System Offline (Render waking up...)'}
                         </span>
                     </div>
+                    <div className="backend-indicator">{API_URL}</div>
                     <div className="app-logo">🔐</div>
                     <h2>E-Debt System</h2>
                     <p className="login-subtitle">
@@ -193,7 +198,7 @@ const Login = ({ onLogin }) => {
                     </button>
                 </form>
 
-            
+
             </div>
         </div>
     );
