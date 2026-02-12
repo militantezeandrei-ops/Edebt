@@ -17,6 +17,7 @@ const AdminCustomers = () => {
     const [formCustomerType, setFormCustomerType] = useState('Regular');
     const [formPaymentStatus, setFormPaymentStatus] = useState('Not Paid');
     const [formPartialAmount, setFormPartialAmount] = useState('');
+    const [saving, setSaving] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const ITEMS_PER_PAGE = 10;
 
@@ -140,7 +141,8 @@ const AdminCustomers = () => {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        if (!formName.trim()) return;
+        if (!formName.trim() || saving) return;
+        setSaving(true);
 
         try {
             const payload = {
@@ -187,6 +189,8 @@ const AdminCustomers = () => {
             fetchData();
         } catch (err) {
             Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.error || 'Failed' });
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -469,7 +473,7 @@ const AdminCustomers = () => {
                             )}
                             <div className="modal-actions">
                                 <button type="button" className="btn-cancel" onClick={closeModal}>Cancel</button>
-                                <button type="submit" className="btn-save">{editingCustomer ? 'Update' : 'Add'}</button>
+                                <button type="submit" className="btn-save" disabled={saving}>{saving ? 'Saving...' : (editingCustomer ? 'Update' : 'Add')}</button>
                             </div>
                         </form>
                     </div>

@@ -283,6 +283,31 @@
     padding: 0 40px 40px 40px;
 }
 
+/* === Light Mode Overrides === */
+[data-theme="light"] .sidebar-item:hover {
+    color: #1f2937;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .sidebar-item.active {
+    color: #1f2937;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+[data-theme="light"] .profile-name {
+    color: #1f2937;
+}
+
+[data-theme="light"] .icon-btn:hover {
+    color: #1f2937;
+}
+
+[data-theme="light"] .topbar-search input {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #1f2937;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .admin-sidebar {

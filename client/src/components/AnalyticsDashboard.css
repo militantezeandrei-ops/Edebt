@@ -501,3 +501,34 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* === Light Mode Overrides === */
+[data-theme="light"] .m-value {
+    color: #1f2937;
+}
+
+[data-theme="light"] .m-bar-bg {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .p-bar-bg {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .m-icon-box {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .ai-content {
+    background: rgba(99, 102, 241, 0.04);
+    color: #374151;
+}
+
+[data-theme="light"] .ai-content span {
+    color: #d97706;
+}
+
+[data-theme="light"] .c-type {
+    background: rgba(59, 130, 246, 0.08);
+    color: #3b82f6;
+}

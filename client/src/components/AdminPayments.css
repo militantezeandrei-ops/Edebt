@@ -340,68 +340,69 @@
     color: #ef4444;
     font-size: 15px;
 }
+
 /* === Light Mode === */
-[data-theme=""light""] .payment-card {
+[data-theme="light"] .payment-card {
     background: #ffffff;
     border-color: #e5e7eb;
 }
 
-[data-theme=""light""] .payment-card h3 {
+[data-theme="light"] .payment-card h3 {
     color: #1f2937;
 }
 
-[data-theme=""light""] .pay-field label {
+[data-theme="light"] .pay-field label {
     color: #6b7280;
 }
 
-[data-theme=""light""] .pay-field input {
+[data-theme="light"] .pay-field input {
     background: #f9fafb;
     border-color: #d1d5db;
     color: #1f2937;
 }
 
-[data-theme=""light""] .sc-name {
+[data-theme="light"] .sc-name {
     color: #1f2937;
 }
 
-[data-theme=""light""] .btn-change {
+[data-theme="light"] .btn-change {
     border-color: #d1d5db;
     color: #6b7280;
 }
 
-[data-theme=""light""] .btn-change:hover {
+[data-theme="light"] .btn-change:hover {
     background: #f3f4f6;
     color: #374151;
 }
 
-[data-theme=""light""] .customer-selector input {
+[data-theme="light"] .customer-selector input {
     background: #f9fafb;
     border-color: #d1d5db;
     color: #1f2937;
 }
 
-[data-theme=""light""] .customer-dropdown {
+[data-theme="light"] .customer-dropdown {
     background: #ffffff;
     border-color: #e5e7eb;
 }
 
-[data-theme=""light""] .dropdown-item {
+[data-theme="light"] .dropdown-item {
     color: #1f2937;
 }
 
-[data-theme=""light""] .dd-name {
+[data-theme="light"] .dd-name {
     color: #374151;
 }
 
-[data-theme=""light""] .ds-card {
+[data-theme="light"] .ds-card {
     background: #ffffff;
     border-color: #e5e7eb;
 }
 
-[data-theme=""light""] .ds-value {
+[data-theme="light"] .ds-value {
     color: #1f2937;
 }
 
-[data-theme=""light""] .di-name {
+[data-theme="light"] .di-name {
     color: #1f2937;
 }

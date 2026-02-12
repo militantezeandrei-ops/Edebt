@@ -471,3 +471,37 @@
     border-color: #d1d5db;
     color: #6b7280;
 }
+
+[data-theme="light"] .date-group {
+    border-color: #e5e7eb;
+    background: #ffffff;
+}
+
+[data-theme="light"] .date-group:hover {
+    background: #f9fafb;
+}
+
+[data-theme="light"] .date-group-header .date-label {
+    color: #1f2937;
+}
+
+[data-theme="light"] .date-group-header .activity-count {
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+[data-theme="light"] .time {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .expand-icon {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .activity-item:first-child {
+    border-top-color: #e5e7eb;
+}
+
+[data-theme="light"] .empty-logs {
+    color: #9ca3af;
+}

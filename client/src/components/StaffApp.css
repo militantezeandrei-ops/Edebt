@@ -238,3 +238,12 @@
         transform: translateY(0);
     }
 }
+
+/* === Light Mode === */
+[data-theme="light"] .staff-bottom-nav {
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .staff-fab {
+    border-color: #ffffff;
+}

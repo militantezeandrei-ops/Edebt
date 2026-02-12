@@ -17,7 +17,7 @@ const AdminApp = ({ onLogout, darkMode, toggleDarkMode }) => {
         { id: 'dashboard', label: 'Dashboard', icon: '🎛️' },
         { id: 'customers', label: 'Customers', icon: '👥' },
         { id: 'users', label: 'Staff/Users', icon: '👤' },
-        { id: 'export', label: 'Reports', icon: '📊' },
+        { id: 'export', label: 'Export Reports', icon: '📊' },
         { id: 'settings', label: 'Settings', icon: '⚙️' },
     ];
 

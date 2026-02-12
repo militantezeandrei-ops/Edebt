@@ -794,8 +794,13 @@
     --input-bg: #f3f4f6;
 }
 
+[data-theme="light"] .admin-loading {
+    color: #6b7280;
+}
+
 [data-theme="light"] .search-box {
     background: var(--input-bg);
+    border-color: var(--border-soft);
 }
 
 [data-theme="light"] .search-box input {
@@ -808,13 +813,29 @@
     color: var(--text-muted);
 }
 
+[data-theme="light"] .filter-chip.active {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.4);
+    color: #4f46e5;
+}
+
+[data-theme="light"] .filter-chip:hover:not(.active) {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
 [data-theme="light"] .stat-card {
     background: var(--card-bg);
     border-color: var(--border-soft);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="light"] .stat-value {
     color: var(--text-main);
+}
+
+[data-theme="light"] .stat-label {
+    color: #6b7280;
 }
 
 [data-theme="light"] .admin-customer-card {
@@ -822,17 +843,46 @@
     border-color: var(--border-soft);
 }
 
+[data-theme="light"] .admin-customer-card.expanded {
+    border-color: rgba(99, 102, 241, 0.4);
+    background: #fafbff;
+}
+
 [data-theme="light"] .admin-list-header {
     background: #f1f5f9;
     border-bottom: 1px solid var(--border-soft);
+}
+
+[data-theme="light"] .alh-col {
+    color: #6b7280;
+}
+
+[data-theme="light"] .acc-header:hover {
+    background: #f8fafc;
 }
 
 [data-theme="light"] .acc-name {
     color: var(--text-main);
 }
 
-[data-theme="light"] .acc-header:hover {
-    background: #f8fafc;
+[data-theme="light"] .acc-sub-id {
+    color: #6b7280;
+}
+
+[data-theme="light"] .acc-badge.regular {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="light"] .acc-badge.non-regular {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="light"] .acc-expand-icon {
+    color: #6b7280;
 }
 
 [data-theme="light"] .btn-icon-edit,
@@ -840,13 +890,71 @@
     background: var(--input-bg);
 }
 
+[data-theme="light"] .btn-icon-edit {
+    color: #6366f1;
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="light"] .btn-icon-delete {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Drawer / Expanded Section */
+[data-theme="light"] .acc-drawer {
+    border-top-color: var(--border-soft);
+}
+
+[data-theme="light"] .acc-drawer h5 {
+    color: #6b7280;
+}
+
+[data-theme="light"] .acc-orders-table thead th {
+    color: #374151;
+    border-bottom-color: var(--border-soft);
+}
+
+[data-theme="light"] .acc-orders-table tbody td {
+    color: #4b5563;
+    border-bottom-color: #f3f4f6;
+}
+
+[data-theme="light"] .od-date {
+    color: #6b7280;
+}
+
+[data-theme="light"] .acc-empty {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .empty-state {
+    color: #9ca3af;
+}
+
+/* Modal */
 [data-theme="light"] .customer-modal {
     background: var(--card-bg);
     border-color: var(--border-soft);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
 [data-theme="light"] .modal-header h3 {
     color: var(--text-main);
+}
+
+[data-theme="light"] .modal-close {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+[data-theme="light"] .modal-close:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+[data-theme="light"] .modal-field label {
+    color: #374151;
 }
 
 [data-theme="light"] .modal-field input,
@@ -861,8 +969,59 @@
     color: var(--text-main);
 }
 
+[data-theme="light"] .modal-balance-display {
+    background: #f8fafc;
+    border-color: #d1d5db;
+}
+
+[data-theme="light"] .balance-info-row {
+    color: #6b7280;
+}
+
+[data-theme="light"] .balance-info-row.projected {
+    color: #1f2937;
+    border-top-color: #e5e7eb;
+}
+
+[data-theme="light"] .current-amt {
+    color: #374151;
+}
+
+[data-theme="light"] .field-hint {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .btn-cancel {
+    border-color: #d1d5db;
+    color: #6b7280;
+    background: #f9fafb;
+}
+
+[data-theme="light"] .btn-cancel:hover {
+    background: #f3f4f6;
+}
+
+[data-theme="light"] .btn-save:disabled {
+    opacity: 0.5;
+}
+
+/* Pagination */
 [data-theme="light"] .page-btn {
     background: var(--card-bg);
     border-color: var(--border-soft);
     color: var(--text-main);
+}
+
+[data-theme="light"] .page-btn:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #4f46e5;
+}
+
+[data-theme="light"] .page-info {
+    color: #6b7280;
+}
+
+[data-theme="light"] .page-info b {
+    color: #1f2937;
 }

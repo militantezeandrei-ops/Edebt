@@ -150,9 +150,7 @@
     font-weight: 600;
     color: #f1f5f9;
     font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    word-break: break-word;
 }
 
 .scc-badge {
@@ -389,107 +387,160 @@
         font-size: 12px;
     }
 }
+
 /* === Light Mode === */
-[data-theme=""light""] .staff-search-bar {
+[data-theme="light"] .staff-search-bar {
     background: #ffffff;
     border-color: #d1d5db;
 }
 
-[data-theme=""light""] .staff-search-bar input {
+[data-theme="light"] .staff-search-bar input {
     color: #1f2937;
 }
 
-[data-theme=""light""] .staff-filter-chip {
+[data-theme="light"] .staff-filter-chip {
     border-color: #d1d5db;
     background: #f9fafb;
     color: #6b7280;
 }
 
-[data-theme=""light""] .staff-filter-chip.active {
+[data-theme="light"] .staff-filter-chip.active {
     background: rgba(99, 102, 241, 0.1);
     border-color: rgba(99, 102, 241, 0.4);
     color: #6366f1;
 }
 
-[data-theme=""light""] .staff-filter-chip:hover:not(.active) {
+[data-theme="light"] .staff-filter-chip:hover:not(.active) {
     background: #f3f4f6;
     color: #374151;
 }
 
-[data-theme=""light""] .staff-stat {
+[data-theme="light"] .staff-stat {
     background: #ffffff;
     border-color: #e5e7eb;
 }
 
-[data-theme=""light""] .ss-value {
+[data-theme="light"] .ss-value {
     color: #1f2937;
 }
 
-[data-theme=""light""] .ss-label {
+[data-theme="light"] .ss-label {
     color: #6b7280;
 }
 
-[data-theme=""light""] .staff-customer-card {
+[data-theme="light"] .staff-customer-card {
     background: #ffffff;
     border-color: #e5e7eb;
 }
 
-[data-theme=""light""] .staff-customer-card.expanded {
+[data-theme="light"] .staff-customer-card.expanded {
     background: rgba(99, 102, 241, 0.03);
     border-color: rgba(99, 102, 241, 0.3);
 }
 
-[data-theme=""light""] .scc-name {
+[data-theme="light"] .scc-name {
     color: #1f2937;
 }
 
-[data-theme=""light""] .scc-badge.regular {
+[data-theme="light"] .scc-badge.regular {
     background: rgba(16, 185, 129, 0.1);
     color: #059669;
 }
 
-[data-theme=""light""] .scc-badge.non-regular {
+[data-theme="light"] .scc-badge.non-regular {
     background: rgba(245, 158, 11, 0.1);
     color: #d97706;
 }
 
-[data-theme=""light""] .scc-drawer {
+[data-theme="light"] .scc-drawer {
     border-top-color: #e5e7eb;
 }
 
-[data-theme=""light""] .scc-drawer h5 {
+[data-theme="light"] .scc-drawer h5 {
     color: #6b7280;
 }
 
-[data-theme=""light""] .scc-order-item {
+[data-theme="light"] .scc-order-item {
     border-bottom-color: #f3f4f6;
 }
 
-[data-theme=""light""] .scc-item-tag {
+[data-theme="light"] .scc-item-tag {
     background: rgba(99, 102, 241, 0.08);
     color: #6366f1;
 }
 
-[data-theme=""light""] .staff-pagination {
+[data-theme="light"] .staff-pagination {
     border-top-color: #e5e7eb;
 }
 
-[data-theme=""light""] .sp-btn {
+[data-theme="light"] .sp-btn {
     background: #ffffff;
     border-color: #d1d5db;
     color: #374151;
 }
 
-[data-theme=""light""] .sp-btn:hover:not(:disabled) {
+[data-theme="light"] .sp-btn:hover:not(:disabled) {
     background: rgba(99, 102, 241, 0.08);
     border-color: rgba(99, 102, 241, 0.3);
     color: #6366f1;
 }
 
-[data-theme=""light""] .sp-info {
+[data-theme="light"] .sp-info {
     color: #6b7280;
 }
 
-[data-theme=""light""] .sp-info b {
+[data-theme="light"] .sp-info b {
     color: #1f2937;
+}
+
+[data-theme="light"] .scc-meta {
+    color: #6b7280;
+}
+
+[data-theme="light"] .scc-id {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .scc-payment-status.paid {
+    background: rgba(16, 185, 129, 0.08);
+    color: #059669;
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+[data-theme="light"] .scc-payment-status.unpaid {
+    background: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme="light"] .scc-order-date {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .scc-order-amt {
+    color: #dc2626;
+}
+
+[data-theme="light"] .scc-order-amt.payment {
+    color: #059669;
+}
+
+[data-theme="light"] .scc-empty-orders {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .staff-empty {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .scc-expand {
+    color: #9ca3af;
+}
+
+[data-theme="light"] .scc-balance.debt {
+    color: #dc2626;
+}
+
+[data-theme="light"] .scc-balance.clear {
+    color: #059669;
 }
