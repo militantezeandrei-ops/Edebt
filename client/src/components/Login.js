@@ -134,8 +134,7 @@ const Login = ({ onLogin }) => {
                     icon: 'error',
                     title: 'Login Failed',
                     text: `${errorMessage}. ${3 - newAttempts} attempts remaining.`,
-                    confirmButtonColor: '#ef4444',
-                    footer: `<small>Backend: ${API_URL}</small>`
+                    confirmButtonColor: '#ef4444'
                 });
             }
         } finally {
@@ -156,7 +155,6 @@ const Login = ({ onLogin }) => {
                                 serverStatus === 'online' ? 'System Online' : 'System Offline (Render waking up...)'}
                         </span>
                     </div>
-                    <div className="backend-indicator">{API_URL}</div>
                     <div className="app-logo">🔐</div>
                     <h2>E-Debt System</h2>
                     <p className="login-subtitle">
@@ -197,8 +195,6 @@ const Login = ({ onLogin }) => {
                         {loading ? 'Signing in...' : isLocked ? `Locked (${timeLeft}s)` : 'Sign In'}
                     </button>
                 </form>
-
-
             </div>
         </div>
     );
